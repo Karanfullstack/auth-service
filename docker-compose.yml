@@ -1,0 +1,17 @@
+services:
+   auth-service:
+      image: auth-service:dev
+      build:
+         context: ./docker/development
+      ports:
+         - '5501:5501'
+      environment:
+         NODE_ENV: development
+      env_file:
+         - .env
+      volumes:
+         - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
+         - /usr/src/app/node_modules # Exclude node_modules from the host
+      stdin_open: true # Equivalent to -it
+      tty: true
+      restart: unless-stopped
