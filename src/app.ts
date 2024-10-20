@@ -1,12 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import logger from './config/logger';
+import userRouter from './routes/auth';
 
 const app = express();
 
-app.get('/', async (req, res) => {
-   res.send('health-check');
-});
+app.use('/auth', userRouter);
 
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
    logger.error(error.message);
