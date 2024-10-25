@@ -7,6 +7,7 @@ const startServer = () => {
       app.listen(Config.PORT, () => {
          logger.info(`Server is running at http://localhost:${Config.PORT}`);
       });
+      console.log(Config.DB_NAME);
    } catch (error) {
       if (error instanceof Error) {
          logger.error(error.message);

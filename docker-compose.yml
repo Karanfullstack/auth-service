@@ -1,17 +1,35 @@
 services:
-   auth-service:
+   auth-prep:
       image: auth-service:dev
       build:
-         context: ./docker/development
+         context: .
+         dockerfile: ./docker/development/Dockerfile
       ports:
          - '5501:5501'
-      environment:
-         NODE_ENV: development
+
       env_file:
-         - .env
+         - .env # Load environment variables from .env file
       volumes:
          - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
-         - /usr/src/app/node_modules # Exclude node_modules from the host
+         - /usr/src/app/node_modules # Exclude node_modules
       stdin_open: true # Equivalent to -it
-      tty: true
+      tty: true # Allocate a pseudo-TTY
       restart: unless-stopped
+      depends_on:
+         - postgres # Ensure PostgreSQL starts before auth-prep
+
+   postgres:
+      image: postgres:latest
+      container_name: mernpg-container
+      environment:
+         POSTGRES_USER: root
+         POSTGRES_PASSWORD: root
+         POSTGRES_DB: mernpgdb # Optional: Set a default database
+      volumes:
+         - mernpgdata:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
+      ports:
+         - '5432:5432' # Map port 5432 for PostgreSQL
+      restart: unless-stopped
+
+volumes:
+   mernpgdata:
