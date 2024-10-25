@@ -1,8 +1,11 @@
 import express from 'express';
+import { container } from '../config/inversify.config';
 import AuthController from '../controllers/AuthController';
+import { TYPES } from '../types';
 
 const router = express.Router();
-const authControlleer = new AuthController();
-router.get('/register', authControlleer.register.bind(authControlleer));
+const authController = container.get<AuthController>(TYPES.AuthController);
+router.get('/register', authController.register.bind(authController));
+router.post('/register', authController.register.bind(authController));
 
 export default router;

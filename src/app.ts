@@ -5,7 +5,7 @@ import logger from './config/logger';
 import userRouter from './routes/auth';
 
 const app = express();
-
+app.use(express.json());
 app.use('/auth', userRouter);
 
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {

@@ -4,7 +4,7 @@
    "description": "A user management service",
    "main": "index.js",
    "scripts": {
-      "dev": "cross-env NODE_ENV=dev nodemon src/server.ts",
+      "dev": "cross-env NODE_ENV=test nodemon src/server.ts",
       "build": "npx tsc",
       "format:check": "prettier --check .",
       "format:fix": "prettier --write .",
@@ -46,6 +46,7 @@
    },
    "dependencies": {
       "dotenv": "^16.4.5",
+      "inversify": "^6.0.3",
       "pg": "^8.13.1",
       "reflect-metadata": "^0.2.2",
       "typeorm": "^0.3.20",
