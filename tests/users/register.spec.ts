@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/config/data-source';
 import { truncateTables } from '../utils/truncateTables';
 import { User } from '../../src/entity/User';
+import { RegisterResponse } from '../../src/types';
 
 describe('POST /auth/register', () => {
    let connection: DataSource;
@@ -54,6 +55,21 @@ describe('POST /auth/register', () => {
          expect(users[0].firstName).toBe(userData.firstName);
          expect(users[0].lastName).toBe(userData.lastName);
          expect(users[0].email).toBe(userData.email);
+      });
+
+      it('should return the user id', async () => {
+         const userData = {
+            firstName: 'karan',
+            lastName: 'C',
+            email: 'karan@gmail.com',
+            password: 'secrets12',
+         };
+         const response = await request(app).post('/auth/register').send(userData);
+         expect(response.body as RegisterResponse).toHaveProperty('id');
+         expect(response.body as RegisterResponse).toHaveProperty('success');
+         const userRepository = connection.getRepository(User);
+         const users = await userRepository.find();
+         expect((response.body as RegisterResponse).id).toBe(users[0].id);
       });
    });
 

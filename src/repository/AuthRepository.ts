@@ -5,9 +5,9 @@ import { AuthRepositoryI, UserData } from '../types';
 
 @injectable()
 class AuthRepository implements AuthRepositoryI {
-   async save(data: UserData): Promise<void> {
+   async save(data: UserData): Promise<User> {
       const userRepository = AppDataSource.getRepository(User);
-      await userRepository.save(data);
+      return await userRepository.save(data);
    }
 }
 

@@ -1,7 +1,7 @@
-import winston from 'winston';
+import winston, { Logger } from 'winston';
 import { Config } from '.';
 
-const logger = winston.createLogger({
+const logger: Logger = winston.createLogger({
    level: 'info',
    defaultMeta: { service: 'Auth-Service' },
 
