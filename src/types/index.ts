@@ -6,9 +6,10 @@ export interface UserData {
    lastName: string;
    email: string;
    password: string;
+   role: string;
 }
 export interface RegistgerRequest extends Request {
-   body: UserData;
+   body: Omit<UserData, 'role'>;
 }
 
 export interface RegisterResponse extends User {
@@ -26,10 +27,3 @@ export interface AuthRepositoryI {
 export interface AuthControllerI {
    register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void>;
 }
-
-export const TYPES = {
-   AuthService: Symbol.for('AuthService'),
-   AuthRepository: Symbol.for('AuthRepository'),
-   AuthController: Symbol.for('AuthController'),
-   Logger: Symbol.for('Logger'),
-};

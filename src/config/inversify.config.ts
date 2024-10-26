@@ -1,10 +1,11 @@
 import { Container } from 'inversify';
 import AuthRepository from '../repository/AuthRepository';
 import AuthService from '../services/AuthService';
-import { AuthControllerI, AuthRepositoryI, AuthServiceI, TYPES } from '../types';
+import { AuthControllerI, AuthRepositoryI, AuthServiceI } from '../types';
 import AuthController from '../controllers/AuthController';
 import { Logger } from 'winston';
 import logger from './logger';
+import { TYPES } from '../constants';
 
 const container = new Container();
 

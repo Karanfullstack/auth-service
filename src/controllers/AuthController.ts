@@ -1,7 +1,8 @@
 import { NextFunction, Response } from 'express';
-import { AuthControllerI, AuthServiceI, RegistgerRequest, TYPES } from '../types';
+import { AuthControllerI, AuthServiceI, RegistgerRequest } from '../types';
 import { inject, injectable } from 'inversify';
 import { Logger } from 'winston';
+import { Roles, TYPES } from '../constants';
 
 @injectable()
 class AuthController implements AuthControllerI {
@@ -26,7 +27,13 @@ class AuthController implements AuthControllerI {
       });
 
       try {
-         const user = await this.authService.create({ firstName, lastName, password, email });
+         const user = await this.authService.create({
+            firstName,
+            lastName,
+            password,
+            email,
+            role: Roles.CUSTOMER,
+         });
 
          // logger
          this.logger.info('User created successfully', { user: user.id });

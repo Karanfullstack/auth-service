@@ -17,4 +17,7 @@ export class User implements UserData {
 
    @Column()
    email: string;
+
+   @Column()
+   role: string;
 }

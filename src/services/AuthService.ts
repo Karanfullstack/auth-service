@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { AuthRepositoryI, AuthServiceI, TYPES, UserData } from '../types';
+import { AuthRepositoryI, AuthServiceI, UserData } from '../types';
 import { User } from '../entity/User';
+import { Roles, TYPES } from '../constants';
 
 @injectable()
 class AuthService implements AuthServiceI {
@@ -8,8 +9,14 @@ class AuthService implements AuthServiceI {
    constructor(@inject(TYPES.AuthRepository) authRepository: AuthRepositoryI) {
       this.authRepository = authRepository;
    }
-   async create({ firstName, lastName, password, email }: UserData): Promise<User> {
-      return await this.authRepository.save({ firstName, lastName, password, email });
+   async create({ firstName, lastName, password, email, role }: UserData): Promise<User> {
+      return await this.authRepository.save({
+         firstName,
+         lastName,
+         password,
+         email,
+         role,
+      });
    }
 }
 
