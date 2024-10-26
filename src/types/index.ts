@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../entity/User';
+import { FindOneOptions, FindOptionsWhere } from 'typeorm';
 
 export interface UserData {
    firstName: string;
@@ -22,6 +23,8 @@ export interface AuthServiceI {
 
 export interface AuthRepositoryI {
    save(data: UserData): Promise<User>;
+   findByEmail(email: string): Promise<User | null>;
+   findOne(payload: FindOneOptions<User>): Promise<User | null>;
 }
 
 export interface AuthControllerI {

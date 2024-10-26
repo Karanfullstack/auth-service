@@ -46,7 +46,6 @@ describe('POST /auth/register', () => {
          expect(users[0].lastName).toBe(userData.lastName);
          expect(users[0].email).toBe(userData.email);
       });
-
       it('should return the user id', async () => {
          const response = await request(app).post('/auth/register').send(userData);
          const userRepository = connection.getRepository(User);
@@ -62,6 +61,21 @@ describe('POST /auth/register', () => {
          const users = await userRepository.find();
          expect(users[0]).toHaveProperty('role');
          expect(users[0].role).toBe('customer');
+      });
+      it('should store the hashed password in the database', async () => {
+         await request(app).post('/auth/register').send(userData);
+         const userRepository = connection.getRepository(User);
+         const users = await userRepository.find();
+         expect(users[0].password).not.toBe(userData.password);
+         expect(users[0].password).toHaveLength(60);
+         expect(users[0].password).toMatch(/^\$2b\$\d+\$/);
+      });
+      it('should return 400 status code if the email is already registered', async () => {
+         await request(app).post('/auth/register').send(userData);
+         const response = await request(app).post('/auth/register').send(userData);
+         const users = await connection.getRepository(User).find();
+         expect(users).toHaveLength(1);
+         expect(response.statusCode).toBe(400);
       });
    });
 

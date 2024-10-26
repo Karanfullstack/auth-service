@@ -17,6 +17,7 @@
    "license": "ISC",
    "devDependencies": {
       "@eslint/js": "^9.12.0",
+      "@types/bcrypt": "^5.0.2",
       "@types/eslint__js": "^8.42.3",
       "@types/express": "^5.0.0",
       "@types/jest": "^29.5.13",
@@ -45,6 +46,7 @@
       ]
    },
    "dependencies": {
+      "bcrypt": "^5.1.1",
       "dotenv": "^16.4.5",
       "inversify": "^6.0.3",
       "pg": "^8.13.1",

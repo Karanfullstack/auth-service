@@ -6,9 +6,6 @@ services:
          dockerfile: ./docker/development/Dockerfile
       ports:
          - '5501:5501'
-
-      env_file:
-         - .env # Load environment variables from .env file
       volumes:
          - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
          - /usr/src/app/node_modules # Exclude node_modules
@@ -22,9 +19,9 @@ services:
       image: postgres:latest
       container_name: mernpg-container
       environment:
-         POSTGRES_USER: root
-         POSTGRES_PASSWORD: root
-         POSTGRES_DB: mernpgdb # Optional: Set a default database
+         POSTGRES_USER: ${DB_USER}
+         POSTGRES_PASSWORD: ${DB_PASSWORD}
+         POSTGRES_DB: ${DB_NAME} # Optional: Set a default database
       volumes:
          - mernpgdata:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
       ports:

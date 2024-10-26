@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use('/auth', userRouter);
 
-app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
+app.use((error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
    logger.error(error.message);
    const statusCode = error.statusCode || 500;
 
