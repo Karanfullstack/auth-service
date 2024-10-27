@@ -93,4 +93,18 @@ describe('POST /auth/register', () => {
          expect(response.statusCode).toBe(400);
       });
    });
+
+   describe('Fieldds are not proper', () => {
+      const userData = {
+         firstName: 'karan',
+         lastName: 'C',
+         email: ' karan@gmail.com ',
+         password: 'secrets12',
+      };
+      it('should trim the email field', async () => {
+         await request(app).post('/auth/register').send(userData);
+         const repository = await connection.getRepository(User).find();
+         expect(repository[0].email).toBe('karan@gmail.com');
+      });
+   });
 });
