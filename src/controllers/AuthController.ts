@@ -3,6 +3,7 @@ import { AuthControllerI, AuthServiceI, RegistgerRequest } from '../types';
 import { inject, injectable } from 'inversify';
 import { Logger } from 'winston';
 import { Roles, TYPES } from '../constants';
+import { validationResult } from 'express-validator';
 
 @injectable()
 class AuthController implements AuthControllerI {
@@ -16,6 +17,13 @@ class AuthController implements AuthControllerI {
       this.logger = logger;
    }
    async register(req: RegistgerRequest, res: Response, next: NextFunction) {
+      // validate request
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+         res.status(400).json({ erros: result.array() });
+         return;
+      }
+
       const { firstName, lastName, password, email } = req.body;
 
       // logger debug

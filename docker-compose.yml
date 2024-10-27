@@ -11,7 +11,7 @@ services:
          - /usr/src/app/node_modules # Exclude node_modules
       stdin_open: true # Equivalent to -it
       tty: true # Allocate a pseudo-TTY
-      restart: unless-stopped
+      restart: always
       depends_on:
          - postgres # Ensure PostgreSQL starts before auth-prep
 
