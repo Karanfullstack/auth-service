@@ -20,7 +20,7 @@ class AuthController implements AuthControllerI {
       // validate request
       const result = validationResult(req);
       if (!result.isEmpty()) {
-         res.status(400).json({ erros: result.array() });
+         res.status(400).json({ errors: result.array() });
          return;
       }
 
