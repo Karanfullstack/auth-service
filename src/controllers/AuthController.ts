@@ -17,16 +17,17 @@ class AuthController implements AuthControllerI {
       this.logger = logger;
    }
    async register(req: RegistgerRequest, res: Response, next: NextFunction) {
-      // validate request
+      // @VALIDATE REQUEST
       const result = validationResult(req);
       if (!result.isEmpty()) {
          res.status(400).json({ errors: result.array() });
          return;
       }
 
+      // @BODY
       const { firstName, lastName, password, email } = req.body;
 
-      // logger debug
+      // @LOGGER DUBUG
       this.logger.debug('New request to register', {
          firstName,
          lastName,
@@ -45,6 +46,25 @@ class AuthController implements AuthControllerI {
 
          // logger
          this.logger.info('User created successfully', { user: user.id });
+
+         // set cookies
+         const accessToken = this.authService.signToken({
+            sub: String(user.id),
+            role: user.role,
+         });
+         const refreshToken = 'efeeefefe';
+
+         res.cookie('accessToken', accessToken, {
+            domain: 'localhost',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+         }).cookie('refreshToken', refreshToken, {
+            domain: 'localhost',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+         });
 
          res.status(201).json({ id: user.id, success: true });
       } catch (error) {

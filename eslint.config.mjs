@@ -35,7 +35,6 @@ export default tseslint.config(
       },
    },
 
-   // global variables, applies to everything
    {
       languageOptions: {
          globals: {

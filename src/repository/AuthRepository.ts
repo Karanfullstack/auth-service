@@ -6,17 +6,15 @@ import { FindOneOptions } from 'typeorm';
 
 @injectable()
 class AuthRepository implements AuthRepositoryI {
+   private userRepository = AppDataSource.getRepository(User);
    async save(data: UserData): Promise<User> {
-      const userRepository = AppDataSource.getRepository(User);
-      return await userRepository.save(data);
+      return await this.userRepository.save(data);
    }
    async findByEmail(email: string): Promise<User | null> {
-      const userRepository = AppDataSource.getRepository(User);
-      return await userRepository.findOneBy({ email });
+      return await this.userRepository.findOneBy({ email });
    }
    async findOne(payload: FindOneOptions<User>): Promise<User | null> {
-      const userRepository = AppDataSource.getRepository(User);
-      return await userRepository.findOne(payload);
+      return await this.userRepository.findOne(payload);
    }
 }
 

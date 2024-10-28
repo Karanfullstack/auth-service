@@ -3,6 +3,7 @@ export const TYPES = {
    AuthRepository: Symbol.for('AuthRepository'),
    AuthController: Symbol.for('AuthController'),
    Logger: Symbol.for('Logger'),
+   JWTService: Symbol.for('JWTService'),
 };
 
 export const Roles = {
