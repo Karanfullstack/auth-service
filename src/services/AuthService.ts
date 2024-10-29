@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { AuthRepositoryI, AuthServiceI, UserData } from '../types';
+import { UserData } from '../types';
+import { IAuthService } from './Interfaces/IAuthService';
+import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import { User } from '../entity/User';
 import { TYPES } from '../constants';
 import bcrypt from 'bcrypt';
@@ -7,12 +9,11 @@ import createHttpError from 'http-errors';
 import { Config } from '../config';
 
 @injectable()
-class AuthService implements AuthServiceI {
-   private authRepository: AuthRepositoryI;
-   constructor(@inject(TYPES.AuthRepository) authRepository: AuthRepositoryI) {
+class AuthService implements IAuthService {
+   private authRepository: IAuthRepository;
+   constructor(@inject(TYPES.AuthRepository) authRepository: IAuthRepository) {
       this.authRepository = authRepository;
    }
-
    // Register a new user
    async create({ firstName, lastName, password, email, role }: UserData): Promise<User> {
       const user = await this.authRepository.findByEmail(email);
@@ -22,13 +23,13 @@ class AuthService implements AuthServiceI {
       }
       const salt = Number(Config.BCRYPT_SALT) || 10;
       const hashed = await bcrypt.hash(password, salt);
-      return this.authRepository.save({
-         firstName,
-         lastName,
-         password: hashed,
-         email,
-         role,
-      });
+      const newUser = new User();
+      newUser.firstName = firstName;
+      newUser.lastName = lastName;
+      newUser.password = hashed;
+      newUser.email = email;
+      newUser.role = role;
+      return this.authRepository.save(newUser);
    }
 }
 

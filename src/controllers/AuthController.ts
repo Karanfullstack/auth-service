@@ -1,22 +1,24 @@
 import { NextFunction, Response } from 'express';
-import { AuthControllerI, AuthServiceI, RegistgerRequest } from '../types';
+import { RegistgerRequest } from '../types';
+import { IAuthService } from '../services/Interfaces/IAuthService';
 import { inject, injectable } from 'inversify';
 import { Logger } from 'winston';
 import { Roles, TYPES } from '../constants';
 import { validationResult } from 'express-validator';
 import JwtService from '../utils/jwt.utils';
+import { IAuthController } from './Interfaces/IAuthController';
 @injectable()
-class AuthController implements AuthControllerI {
-   private authService: AuthServiceI;
+class AuthController implements IAuthController {
+   private authService: IAuthService;
    private logger: Logger;
    constructor(
-      @inject(TYPES.AuthService) authService: AuthServiceI,
+      @inject(TYPES.AuthService) authService: IAuthService,
       @inject(TYPES.Logger) logger: Logger,
    ) {
       this.authService = authService;
       this.logger = logger;
    }
-   async register(req: RegistgerRequest, res: Response, next: NextFunction) {
+   async register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void> {
       // @VALIDATE REQUEST
       const result = validationResult(req);
       if (!result.isEmpty()) {

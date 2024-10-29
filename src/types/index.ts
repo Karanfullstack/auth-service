@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../entity/User';
-import { FindOneOptions } from 'typeorm';
 
 export interface UserData {
    firstName: string;
@@ -15,18 +14,6 @@ export interface RegistgerRequest extends Request {
 
 export interface RegisterResponse extends User {
    success: boolean;
-}
-
-export interface AuthRepositoryI {
-   save(data: UserData): Promise<User>;
-   findByEmail(email: string): Promise<User | null>;
-   findOne(payload: FindOneOptions<User>): Promise<User | null>;
-}
-export interface AuthServiceI {
-   create(data: UserData): Promise<User>;
-}
-export interface AuthControllerI {
-   register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void>;
 }
 
 // Utils

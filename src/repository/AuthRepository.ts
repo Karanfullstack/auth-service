@@ -1,12 +1,16 @@
 import { injectable } from 'inversify';
+import { FindOneOptions, Repository } from 'typeorm';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/User';
-import { AuthRepositoryI, UserData } from '../types';
-import { FindOneOptions } from 'typeorm';
+import { UserData } from '../types';
+import { IAuthRepository } from './Interfaces/IAuthRepoistory';
 
 @injectable()
-class AuthRepository implements AuthRepositoryI {
-   private userRepository = AppDataSource.getRepository(User);
+class AuthRepository implements IAuthRepository {
+   private userRepository: Repository<User>;
+   constructor() {
+      this.userRepository = AppDataSource.getRepository(User);
+   }
    async save(data: UserData): Promise<User> {
       return await this.userRepository.save(data);
    }
