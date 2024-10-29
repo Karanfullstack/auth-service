@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../entity/User';
 import { FindOneOptions } from 'typeorm';
-import { JwtPayload } from 'jsonwebtoken';
 
 export interface UserData {
    firstName: string;
@@ -11,7 +10,7 @@ export interface UserData {
    role: string;
 }
 export interface RegistgerRequest extends Request {
-   body: Omit<UserData, 'role' | 'id'>;
+   body: Omit<UserData, 'role'>;
 }
 
 export interface RegisterResponse extends User {
@@ -25,18 +24,9 @@ export interface AuthRepositoryI {
 }
 export interface AuthServiceI {
    create(data: UserData): Promise<User>;
-   signToken(payload: JwtPayload): string;
-   verifytoken(token: string): JwtPayload;
-   decodeToken(token: string): JwtPayload;
 }
 export interface AuthControllerI {
    register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void>;
 }
 
 // Utils
-
-export interface JwtServiceI {
-   signToken(payload: JwtPayload): string;
-   verifytoken(token: string): JwtPayload;
-   decodeToken(token: string): JwtPayload;
-}

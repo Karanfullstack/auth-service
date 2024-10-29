@@ -51,7 +51,6 @@ describe('POST /auth/register', () => {
          const response = await request(app).post('/auth/register').send(userData);
          const userRepository = connection.getRepository(User);
          const users = await userRepository.find();
-
          expect(response.body as RegisterResponse).toHaveProperty('id');
          expect(response.body as RegisterResponse).toHaveProperty('success');
          expect((response.body as RegisterResponse).id).toBe(users[0].id);
@@ -96,11 +95,10 @@ describe('POST /auth/register', () => {
                refreshToken = cookie.split(';')[0].split('=')[1];
             }
          });
-
          expect(accessToken).not.toBeNull();
          expect(refreshToken).not.toBeNull();
          expect(isJwt(accessToken)).toBeTruthy();
-         // expect(isJwt(refreshToken)).toBeTruthy();
+         expect(isJwt(refreshToken)).toBeTruthy();
       });
    });
 

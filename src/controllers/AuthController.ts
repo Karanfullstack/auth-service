@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import { Logger } from 'winston';
 import { Roles, TYPES } from '../constants';
 import { validationResult } from 'express-validator';
-
+import JwtService from '../utils/jwt.utils';
 @injectable()
 class AuthController implements AuthControllerI {
    private authService: AuthServiceI;
@@ -48,25 +48,24 @@ class AuthController implements AuthControllerI {
          this.logger.info('User created successfully', { user: user.id });
 
          // set cookies
-         const accessToken = this.authService.signToken({
-            sub: String(user.id),
-            role: user.role,
-         });
-         const refreshToken = 'efeeefefe';
+         const payload = { sub: String(user.id), role: user.role };
+         const accessToken = JwtService.signToken(payload);
+         const refreshToken = JwtService.refreshToken(payload);
 
+         const cookie_age = 1000 * 60 * 60;
          res.cookie('accessToken', accessToken, {
             domain: 'localhost',
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
+            maxAge: cookie_age,
             httpOnly: true,
          }).cookie('refreshToken', refreshToken, {
             domain: 'localhost',
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
+            maxAge: cookie_age,
             httpOnly: true,
          });
 
-         res.status(201).json({ id: user.id, success: true });
+         res.status(201).json({ ...user, success: true });
       } catch (error) {
          return next(error);
       }
