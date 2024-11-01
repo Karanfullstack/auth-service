@@ -4,6 +4,7 @@ import app from './app';
 
 const startServer = () => {
    try {
+      console.log(Config.DB_NAME);
       app.listen(Config.PORT, () => {
          logger.info(`Server is running at http://localhost:${Config.PORT}`);
       });

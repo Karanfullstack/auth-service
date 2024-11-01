@@ -29,6 +29,7 @@ class AuthService implements IAuthService {
       newUser.password = hashed;
       newUser.email = email;
       newUser.role = role;
+
       return this.authRepository.save(newUser);
    }
 }

@@ -14,9 +14,11 @@ const {
    REFRESH_TOKEN_SECRET,
    EXPIRES_DATE_TOKEN,
    ISSUER_TOKEN,
+   HOST,
 } = process.env;
 
 export const Config = {
+   HOST,
    PORT,
    NODE_ENV,
    DB_NAME,
