@@ -1,14 +1,17 @@
 import logger from './config/logger';
 import { Config } from './config';
 import app from './app';
+import { AppDataSource } from './config/data-source';
 
-const startServer = () => {
+const startServer = async () => {
    try {
-      console.log(Config.DB_NAME);
+      logger.info('Database ' + Config.DB_NAME);
+      await AppDataSource.initialize();
+      logger.info('Database is connected sucessfully.');
       app.listen(Config.PORT, () => {
          logger.info(`Server is running at http://localhost:${Config.PORT}`);
       });
-   } catch (error) {
+   } catch (error: unknown) {
       if (error instanceof Error) {
          logger.error(error.message);
          setTimeout(() => process.exit(1), 1000);
@@ -16,4 +19,4 @@ const startServer = () => {
    }
 };
 
-startServer();
+void startServer();

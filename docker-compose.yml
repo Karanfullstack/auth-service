@@ -26,7 +26,7 @@ services:
          - mernpgdata:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
       ports:
          - '5432:5432' # Map port 5432 for PostgreSQL
-      restart: unless-stopped
+      restart: always
 
 volumes:
    mernpgdata:

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request } from 'express';
 import { User } from '../entity/User';
 
 export interface UserData {

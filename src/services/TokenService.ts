@@ -59,6 +59,7 @@ class TokenService {
          throw err;
       }
    }
+
    verifyRefreshToken(refreshToken: string): JwtPayload {
       try {
          const decodedRefreshToken = jwt.verify(refreshToken, this.refreshTokenSecret);
@@ -68,6 +69,7 @@ class TokenService {
          throw err;
       }
    }
+
    async persistRefreshToken(user: User) {
       try {
          const newRefreshToken = await this.RefreshTokenRepository.save({
