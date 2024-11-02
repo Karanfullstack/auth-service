@@ -32,11 +32,11 @@ describe('POST /auth/register', () => {
          password: 'secrets12',
       };
       it('should return 201 status code', async () => {
-         const response = await request(app).get('/auth/register').send(userData);
+         const response = await request(app).post('/auth/register').send(userData);
          expect(response.statusCode).toBe(201);
       });
       it('should return valid JSON reponse', async () => {
-         const response = await request(app).get('/auth/register').send(userData);
+         const response = await request(app).post('/auth/register').send(userData);
          expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
       });
       it('should persit the user in the database', async () => {
@@ -48,6 +48,7 @@ describe('POST /auth/register', () => {
          expect(users[0].lastName).toBe(userData.lastName);
          expect(users[0].email).toBe(userData.email);
       });
+
       it('should return the user id', async () => {
          const response = await request(app).post('/auth/register').send(userData);
          const userRepository = connection.getRepository(User);
@@ -56,6 +57,7 @@ describe('POST /auth/register', () => {
          expect(response.body as RegisterResponse).toHaveProperty('success');
          expect((response.body as RegisterResponse).id).toBe(users[0].id);
       });
+
       it('should assing a customer role to the user', async () => {
          await request(app).post('/auth/register').send(userData);
          const userRepository = connection.getRepository(User);
@@ -63,6 +65,7 @@ describe('POST /auth/register', () => {
          expect(users[0]).toHaveProperty('role');
          expect(users[0].role).toBe('customer');
       });
+
       it('should store the hashed password in the database', async () => {
          await request(app).post('/auth/register').send(userData);
          const userRepository = connection.getRepository(User);
@@ -71,6 +74,7 @@ describe('POST /auth/register', () => {
          expect(users[0].password).toHaveLength(60);
          expect(users[0].password).toMatch(/^\$2b\$\d+\$/);
       });
+
       it('should return 400 status code if the email is already registered', async () => {
          await request(app).post('/auth/register').send(userData);
          const response = await request(app).post('/auth/register').send(userData);
@@ -101,6 +105,7 @@ describe('POST /auth/register', () => {
          expect(isJwt(accessToken)).toBeTruthy();
          expect(isJwt(refreshToken)).toBeTruthy();
       });
+
       it('should persit Refresh token in the databse', async () => {
          const response = await request(app).post('/auth/register').send(userData);
          const refreshTokenRepository = connection.getRepository(RefreshToken);

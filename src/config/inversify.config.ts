@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { RefreshTokenRepository, UserRepository } from '../repository/FactoryRepository';
 import { User } from '../entity/User';
 import { RefreshToken } from '../entity/RefreshToken';
+import CredentialService from '../services/CredentialService';
 
 const container = new Container();
 
@@ -38,5 +39,6 @@ container.bind<IAuthRepository>(TYPES.AuthRepository).to(AuthRepository);
 // UTILS SERVICES LIKE JWT, MAILER, ETC
 container.bind<TokenService>(TYPES.TokenService).to(TokenService);
 container.bind<Logger>(TYPES.Logger).toConstantValue(logger);
+container.bind<CredentialService>(TYPES.CredentialService).to(CredentialService);
 
 export { container };

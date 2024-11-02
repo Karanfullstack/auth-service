@@ -45,7 +45,7 @@ class TokenService {
       }
    }
 
-   generateRefreshToken(payload: JwtPayload, jwtID?: number): string {
+   generateRefreshToken(payload: JwtPayload, jwtID: number): string {
       try {
          const refreshToken = jwt.sign(payload, this.refreshTokenSecret, {
             algorithm: 'HS256',

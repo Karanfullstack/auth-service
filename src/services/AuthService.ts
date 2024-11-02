@@ -4,15 +4,19 @@ import { IAuthService } from './Interfaces/IAuthService';
 import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import { User } from '../entity/User';
 import { TYPES } from '../constants';
-import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
-import { Config } from '../config';
+import CredentialService from './CredentialService';
 
 @injectable()
 class AuthService implements IAuthService {
    private authRepository: IAuthRepository;
-   constructor(@inject(TYPES.AuthRepository) authRepository: IAuthRepository) {
+   private credentialService: CredentialService;
+   constructor(
+      @inject(TYPES.AuthRepository) authRepository: IAuthRepository,
+      @inject(TYPES.CredentialService) credentialService: CredentialService,
+   ) {
       this.authRepository = authRepository;
+      this.credentialService = credentialService;
    }
    // Register a new user
    async create({ firstName, lastName, password, email, role }: UserData): Promise<User> {
@@ -21,8 +25,8 @@ class AuthService implements IAuthService {
          const err = createHttpError(400, 'User already exists');
          throw err;
       }
-      const salt = Number(Config.BCRYPT_SALT) || 10;
-      const hashed = await bcrypt.hash(password, salt);
+
+      const hashed = await this.credentialService.generateHash(password);
       const newUser = new User();
       newUser.firstName = firstName;
       newUser.lastName = lastName;
@@ -31,6 +35,22 @@ class AuthService implements IAuthService {
       newUser.role = role;
 
       return this.authRepository.save(newUser);
+   }
+   async login({ email, password }: UserData): Promise<User> {
+      const user = await this.authRepository.findByEmail(email);
+
+      if (!user) {
+         const err = createHttpError(401, 'User does not exist');
+         throw err;
+      }
+      const isMatch = await this.credentialService.compareHash(password, user.password);
+
+      if (!isMatch) {
+         const err = createHttpError(401, 'Invalid credentials');
+         throw err;
+      }
+
+      return user;
    }
 }
 

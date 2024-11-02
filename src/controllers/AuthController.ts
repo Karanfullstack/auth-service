@@ -5,8 +5,9 @@ import { Logger } from 'winston';
 import { COOKIES_CONFIG, Roles, TYPES } from '../constants';
 import { IAuthService } from '../services/Interfaces/IAuthService';
 import TokenService from '../services/TokenService';
-import { RegistgerRequest } from '../types';
+import { LoginRequest, RegistgerRequest } from '../types';
 import { IAuthController } from './Interfaces/IAuthController';
+import createHttpError from 'http-errors';
 
 @injectable()
 class AuthController implements IAuthController {
@@ -67,6 +68,34 @@ class AuthController implements IAuthController {
          res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
 
          res.status(201).json({ ...user, success: true });
+      } catch (error) {
+         return next(error);
+      }
+   }
+
+   async login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+         res.status(400).json({ errors: result.array() });
+         return;
+      }
+      const { email, password } = req.body;
+      try {
+         const user = await this.authService.login({ email, password });
+         if (!user) {
+            const err = createHttpError(400, 'Invalid credentials');
+            return next(err);
+         }
+
+         const newRefreshToken = await this.tokenService.persistRefreshToken(user);
+         const payload = { sub: String(user.id), role: user.role };
+         const accessToken = this.tokenService.generateAccessToken(payload);
+         const refreshToken = this.tokenService.generateRefreshToken(payload, newRefreshToken.id);
+
+         res.cookie('accessToken', accessToken, COOKIES_CONFIG);
+         res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
+         this.logger.info('User logged in successfully', { user: user.id });
+         res.status(200).json({ id: user.id, email: user.email });
       } catch (error) {
          return next(error);
       }

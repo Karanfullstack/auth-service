@@ -9,6 +9,7 @@ export const TYPES = {
    TokenService: Symbol.for('TokenService'),
    RefreshTokenRepository: Symbol.for('RefreshTokenRepository'),
    UserRepository: Symbol.for('UserRepository'),
+   CredentialService: Symbol.for('CredentialService'),
 };
 
 export const Roles = {

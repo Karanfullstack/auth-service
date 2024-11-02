@@ -11,6 +11,9 @@ export interface UserData {
 export interface RegistgerRequest extends Request {
    body: Omit<UserData, 'role'>;
 }
+export interface LoginRequest extends Request {
+   body: Pick<UserData, 'email' | 'password'>;
+}
 
 export interface RegisterResponse extends User {
    success: boolean;
