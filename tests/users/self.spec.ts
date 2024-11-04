@@ -78,5 +78,31 @@ describe('GET /auth/self', () => {
 
          expect(response.body.id).toBe(Number(data.id));
       });
+
+      it('should not have password field', async () => {
+         // Arrange
+         const userData = {
+            firstName: 'karan',
+            lastName: 'C',
+            email: 'karan@gmail.com',
+            password: 'secrets12',
+         };
+         // Act
+         const userRepository = new AuthRepository(connection.getRepository(User));
+         const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+         // Generate token
+
+         const accessToken = jwks.token({ sub: String(data.id), role: data.role });
+
+         // add token to cookie
+         const response = await request(app)
+            .get('/auth/self')
+            .set('Cookie', [`accessToken=${accessToken};`])
+            .send();
+
+         // Assert if user id matches with response id
+
+         expect(response.body).not.toHaveProperty('password');
+      });
    });
 });

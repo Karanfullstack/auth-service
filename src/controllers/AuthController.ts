@@ -99,7 +99,7 @@ class AuthController implements IAuthController {
    async self(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
       try {
          const user = await this.authService.self(Number(req.auth.sub));
-         res.status(200).json(user);
+         res.status(200).json({ ...user, password: undefined });
       } catch (error) {
          next(error);
       }
