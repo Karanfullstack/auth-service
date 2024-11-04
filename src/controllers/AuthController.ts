@@ -96,6 +96,7 @@ class AuthController implements IAuthController {
       }
    }
 
+   // @PROTECTED
    async self(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
       try {
          const user = await this.authService.self(Number(req.auth.sub));

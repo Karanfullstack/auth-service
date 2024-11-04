@@ -105,4 +105,23 @@ describe('GET /auth/self', () => {
          expect(response.body).not.toHaveProperty('password');
       });
    });
+   describe('Fields are missing', () => {
+      it('should return 401 status code in case token is missing', async () => {
+         // Arrange
+         const userData = {
+            firstName: 'karan',
+            lastName: 'C',
+            email: 'karan@gmail.com',
+            password: 'secrets12',
+         };
+         // Act
+         const userRepository = new AuthRepository(connection.getRepository(User));
+         await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+
+         const response = await request(app).get('/auth/self').send();
+         console.log(response.body);
+         // Assert if user id matches with response id
+         expect(response.statusCode).toBe(401);
+      });
+   });
 });
