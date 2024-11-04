@@ -6,4 +6,5 @@ export interface IAuthRepository {
    save(data: UserData): Promise<User>;
    findByEmail(email: string): Promise<User | null>;
    findOne(payload: FindOneOptions<User>): Promise<User | null>;
+   findByID(id: number): Promise<User | null>;
 }

@@ -36,11 +36,12 @@ class AuthService implements IAuthService {
 
       return this.authRepository.save(newUser);
    }
+
    async login({ email, password }: UserData): Promise<User> {
       const user = await this.authRepository.findByEmail(email);
 
       if (!user) {
-         const err = createHttpError(401, 'User does not exist');
+         const err = createHttpError(401, 'Unauthorized');
          throw err;
       }
       const isMatch = await this.credentialService.compareHash(password, user.password);
@@ -50,6 +51,15 @@ class AuthService implements IAuthService {
          throw err;
       }
 
+      return user;
+   }
+
+   async self(id: number): Promise<User> {
+      const user = await this.authRepository.findByID(id);
+      if (!user) {
+         const err = createHttpError(404, 'User not found');
+         throw err;
+      }
       return user;
    }
 }

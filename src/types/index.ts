@@ -19,4 +19,13 @@ export interface RegisterResponse extends User {
    success: boolean;
 }
 
-// Utils
+export interface AuthRequest extends Request {
+   auth: {
+      sub: string;
+      role: string;
+   };
+}
+
+export interface AuthCookie {
+   accessToken: string;
+}

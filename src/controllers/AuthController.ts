@@ -1,13 +1,12 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { inject, injectable } from 'inversify';
 import { Logger } from 'winston';
 import { COOKIES_CONFIG, Roles, TYPES } from '../constants';
 import { IAuthService } from '../services/Interfaces/IAuthService';
 import TokenService from '../services/TokenService';
-import { LoginRequest, RegistgerRequest } from '../types';
+import { AuthRequest, LoginRequest, RegistgerRequest } from '../types';
 import { IAuthController } from './Interfaces/IAuthController';
-import createHttpError from 'http-errors';
 
 @injectable()
 class AuthController implements IAuthController {
@@ -23,6 +22,7 @@ class AuthController implements IAuthController {
       this.logger = logger;
       this.tokenService = tokenService;
    }
+
    async register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void> {
       // @VALIDATE REQUEST
       const result = validationResult(req);
@@ -82,11 +82,6 @@ class AuthController implements IAuthController {
       const { email, password } = req.body;
       try {
          const user = await this.authService.login({ email, password });
-         if (!user) {
-            const err = createHttpError(400, 'Invalid credentials');
-            return next(err);
-         }
-
          const newRefreshToken = await this.tokenService.persistRefreshToken(user);
          const payload = { sub: String(user.id), role: user.role };
          const accessToken = this.tokenService.generateAccessToken(payload);
@@ -98,6 +93,15 @@ class AuthController implements IAuthController {
          res.status(200).json({ id: user.id, email: user.email });
       } catch (error) {
          return next(error);
+      }
+   }
+
+   async self(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+      try {
+         const user = await this.authService.self(Number(req.auth.sub));
+         res.status(200).json(user);
+      } catch (error) {
+         next(error);
       }
    }
 }

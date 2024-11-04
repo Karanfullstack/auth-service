@@ -11,7 +11,7 @@ const startServer = async () => {
       }
       logger.info('Database is connected sucessfully.');
       app.listen(Config.PORT, () => {
-         logger.info(`Server is running at http://localhost:${Config.PORT}`);
+         logger.info(`Server is running at http://${Config.HOST}:${Config.PORT}`);
       });
    } catch (error: unknown) {
       if (error instanceof Error) {

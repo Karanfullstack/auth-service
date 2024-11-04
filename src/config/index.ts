@@ -15,6 +15,7 @@ const {
    EXPIRES_DATE_TOKEN,
    ISSUER_TOKEN,
    HOST,
+   JWKS_URI,
 } = process.env;
 
 export const Config = {
@@ -30,4 +31,5 @@ export const Config = {
    REFRESH_TOKEN_SECRET,
    EXPIRES_DATE_TOKEN,
    ISSUER_TOKEN,
+   JWKS_URI,
 };

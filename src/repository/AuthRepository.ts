@@ -17,6 +17,9 @@ class AuthRepository implements IAuthRepository {
    async findOne(payload: FindOneOptions<User>): Promise<User | null> {
       return await this.userRepository.findOne(payload);
    }
+   async findByID(id: number): Promise<User | null> {
+      return await this.userRepository.findOneBy({ id });
+   }
 }
 
 export default AuthRepository;

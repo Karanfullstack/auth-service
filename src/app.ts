@@ -3,9 +3,11 @@ import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import logger from './config/logger';
 import userRouter from './routes/auth';
-
+import cookieParser from 'cookie-parser';
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
+
 app.use('/auth', userRouter);
 
 app.use((error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
