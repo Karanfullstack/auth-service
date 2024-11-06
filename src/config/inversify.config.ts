@@ -5,8 +5,6 @@ import { IAuthController } from '../controllers/Interfaces/IAuthController';
 import { IAuthService } from '../services/Interfaces/IAuthService';
 import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import AuthController from '../controllers/AuthController';
-import { Logger } from 'winston';
-import logger from './logger';
 import { TYPES } from '../constants';
 import TokenService from '../services/TokenService';
 import { Repository } from 'typeorm';
@@ -38,7 +36,6 @@ container.bind<IAuthRepository>(TYPES.AuthRepository).to(AuthRepository);
 
 // UTILS SERVICES LIKE JWT, MAILER, ETC
 container.bind<TokenService>(TYPES.TokenService).to(TokenService);
-container.bind<Logger>(TYPES.Logger).toConstantValue(logger);
 container.bind<CredentialService>(TYPES.CredentialService).to(CredentialService);
 
 export { container };

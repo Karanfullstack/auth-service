@@ -4,7 +4,6 @@ export const TYPES = {
    AuthService: Symbol.for('AuthService'),
    AuthRepository: Symbol.for('AuthRepository'),
    AuthController: Symbol.for('AuthController'),
-   Logger: Symbol.for('Logger'),
    JWTService: Symbol.for('JWTService'),
    TokenService: Symbol.for('TokenService'),
    RefreshTokenRepository: Symbol.for('RefreshTokenRepository'),

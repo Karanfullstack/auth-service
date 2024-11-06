@@ -3,10 +3,10 @@ import { UserData } from '../types';
 import { IAuthService } from './Interfaces/IAuthService';
 import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import { User } from '../entity/User';
-import { TYPES } from '../constants';
+import { COOKIES_CONFIG, TYPES } from '../constants';
 import createHttpError from 'http-errors';
 import CredentialService from './CredentialService';
-
+import { Response } from 'express';
 @injectable()
 class AuthService implements IAuthService {
    private authRepository: IAuthRepository;
@@ -61,6 +61,10 @@ class AuthService implements IAuthService {
          throw err;
       }
       return user;
+   }
+
+   async getUserById(id: number): Promise<User | null> {
+      return this.authRepository.findByID(id);
    }
 }
 

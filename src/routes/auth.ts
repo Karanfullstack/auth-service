@@ -5,6 +5,7 @@ import { TYPES } from '../constants';
 import registerValidator from '../validators/register-validator';
 import loginValidator from '../validators/login-validator';
 import authenticate from '../middlewares/authenticate';
+import validateRefreshToken from '../middlewares/validateRefreshToken';
 
 const router = express.Router();
 
@@ -20,4 +21,10 @@ router.get(
    authController.self.bind(authController) as unknown as RequestHandler,
 );
 
+// @Protected Route
+router.post(
+   '/refresh',
+   validateRefreshToken,
+   authController.refresh.bind(authController) as unknown as RequestHandler,
+);
 export default router;

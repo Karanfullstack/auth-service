@@ -105,6 +105,7 @@ describe('GET /auth/self', () => {
          expect(response.body).not.toHaveProperty('password');
       });
    });
+
    describe('Fields are missing', () => {
       it('should return 401 status code in case token is missing', async () => {
          // Arrange
@@ -119,7 +120,6 @@ describe('GET /auth/self', () => {
          await userRepository.save({ ...userData, role: Roles.CUSTOMER });
 
          const response = await request(app).get('/auth/self').send();
-         console.log(response.body);
          // Assert if user id matches with response id
          expect(response.statusCode).toBe(401);
       });

@@ -82,6 +82,14 @@ class TokenService {
          throw err;
       }
    }
+   async deletePersitToken(id: string): Promise<void> {
+      try {
+         await this.RefreshTokenRepository.delete({ id: Number(id) });
+      } catch (error) {
+         const err = createHttpError(500, 'Error while deleting refresh token');
+         throw err;
+      }
+   }
 }
 
 export default TokenService;

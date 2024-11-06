@@ -1,25 +1,25 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { validationResult } from 'express-validator';
+import createHttpError from 'http-errors';
 import { inject, injectable } from 'inversify';
-import { Logger } from 'winston';
+import { JwtPayload } from 'jsonwebtoken';
+import logger from '../config/logger';
 import { COOKIES_CONFIG, Roles, TYPES } from '../constants';
 import { IAuthService } from '../services/Interfaces/IAuthService';
 import TokenService from '../services/TokenService';
 import { AuthRequest, LoginRequest, RegistgerRequest } from '../types';
 import { IAuthController } from './Interfaces/IAuthController';
+import { log } from 'console';
 
 @injectable()
 class AuthController implements IAuthController {
    private authService: IAuthService;
-   private logger: Logger;
    private tokenService: TokenService;
    constructor(
       @inject(TYPES.AuthService) authService: IAuthService,
-      @inject(TYPES.Logger) logger: Logger,
       @inject(TYPES.TokenService) tokenService: TokenService,
    ) {
       this.authService = authService;
-      this.logger = logger;
       this.tokenService = tokenService;
    }
 
@@ -35,7 +35,7 @@ class AuthController implements IAuthController {
       const { firstName, lastName, password, email } = req.body;
 
       // @LOGGER DUBUG
-      this.logger.debug('New request to register', {
+      logger.debug('New request to register', {
          firstName,
          lastName,
          email,
@@ -52,7 +52,7 @@ class AuthController implements IAuthController {
          });
 
          // logger
-         this.logger.info('User created successfully', { user: user.id });
+         logger.info('User created successfully', { user: user.id });
 
          // saving refreshToken
          const newRefreshToken = await this.tokenService.persistRefreshToken(user);
@@ -64,8 +64,8 @@ class AuthController implements IAuthController {
          const refreshToken = this.tokenService.generateRefreshToken(payload, newRefreshToken.id);
 
          // @SetCookies
-         res.cookie('accessToken', accessToken, COOKIES_CONFIG);
-         res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
+         this.saveRefreshTokenCookie(refreshToken, res);
+         this.saveAccessTokenCookie(accessToken, res);
 
          res.status(201).json({ ...user, success: true });
       } catch (error) {
@@ -82,14 +82,16 @@ class AuthController implements IAuthController {
       const { email, password } = req.body;
       try {
          const user = await this.authService.login({ email, password });
-         const newRefreshToken = await this.tokenService.persistRefreshToken(user);
          const payload = { sub: String(user.id), role: user.role };
+         const newRefreshToken = await this.tokenService.persistRefreshToken(user);
          const accessToken = this.tokenService.generateAccessToken(payload);
          const refreshToken = this.tokenService.generateRefreshToken(payload, newRefreshToken.id);
 
-         res.cookie('accessToken', accessToken, COOKIES_CONFIG);
-         res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
-         this.logger.info('User logged in successfully', { user: user.id });
+         //@SetCookies
+         this.saveRefreshTokenCookie(refreshToken, res);
+         this.saveAccessTokenCookie(accessToken, res);
+
+         logger.info('User logged in successfully', { user: user.id });
          res.status(200).json({ id: user.id, email: user.email });
       } catch (error) {
          return next(error);
@@ -104,6 +106,50 @@ class AuthController implements IAuthController {
       } catch (error) {
          next(error);
       }
+   }
+
+   // @PROTECTED
+   async refresh(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+      try {
+         const user = await this.authService.getUserById(Number(req.auth.sub));
+         if (!user) {
+            const error = createHttpError(404, 'User could not find user with refresh token.');
+            logger.error('User could not find user with refresh token in refresh endpoint');
+            return next(error);
+         }
+         const payload: JwtPayload = { sub: req.auth.sub, role: req.auth.role };
+
+         const persistRefreshToken = await this.tokenService.persistRefreshToken(user);
+         logger.info('Refresh token persist with id', persistRefreshToken.id);
+
+         const accessToken = this.tokenService.generateAccessToken(payload);
+         logger.info('Generated access token', accessToken.slice(0, 10));
+         const newRefreshToken = this.tokenService.generateRefreshToken(
+            payload,
+            persistRefreshToken.id,
+         );
+         logger.info('Generated new refresh token', accessToken.slice(0, 10));
+
+         // @Delete Old Refresh Token
+         await this.tokenService.deletePersitToken(req.auth.jti);
+         logger.info('Old refresh token removed');
+
+         // @Save tokens to cookies
+         this.saveAccessTokenCookie(accessToken, res);
+         this.saveRefreshTokenCookie(newRefreshToken, res);
+
+         res.json({ success: true, refreshTokenID: req.auth.jti });
+      } catch (error) {
+         next(error);
+      }
+   }
+
+   // @Set Cookies Methods
+   saveAccessTokenCookie(accessToken: string, res: Response): void {
+      res.cookie('accessToken', accessToken, COOKIES_CONFIG);
+   }
+   saveRefreshTokenCookie(refreshToken: string, res: Response): void {
+      res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
    }
 }
 
