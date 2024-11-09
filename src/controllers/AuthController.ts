@@ -9,7 +9,6 @@ import { IAuthService } from '../services/Interfaces/IAuthService';
 import TokenService from '../services/TokenService';
 import { AuthRequest, LoginRequest, RegistgerRequest } from '../types';
 import { IAuthController } from './Interfaces/IAuthController';
-import { log } from 'console';
 
 @injectable()
 class AuthController implements IAuthController {
@@ -138,7 +137,19 @@ class AuthController implements IAuthController {
          this.saveAccessTokenCookie(accessToken, res);
          this.saveRefreshTokenCookie(newRefreshToken, res);
 
-         res.json({ success: true, refreshTokenID: req.auth.jti });
+         res.json({ success: true, refreshTokenID: Number(persistRefreshToken.id) });
+      } catch (error) {
+         next(error);
+      }
+   }
+
+   // @PROTECTED
+   async logout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+      try {
+         await this.tokenService.deletePersitToken(req.auth.jti);
+         res.clearCookie('accessToken');
+         res.clearCookie('refreshToken');
+         res.json({ success: true });
       } catch (error) {
          next(error);
       }

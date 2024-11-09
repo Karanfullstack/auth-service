@@ -3,10 +3,10 @@ import { UserData } from '../types';
 import { IAuthService } from './Interfaces/IAuthService';
 import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import { User } from '../entity/User';
-import { COOKIES_CONFIG, TYPES } from '../constants';
+import { TYPES } from '../constants';
 import createHttpError from 'http-errors';
 import CredentialService from './CredentialService';
-import { Response } from 'express';
+
 @injectable()
 class AuthService implements IAuthService {
    private authRepository: IAuthRepository;

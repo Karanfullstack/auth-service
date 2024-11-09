@@ -27,4 +27,12 @@ router.post(
    validateRefreshToken,
    authController.refresh.bind(authController) as unknown as RequestHandler,
 );
+
+// @Protected Route
+router.post(
+   '/logout',
+   authenticate,
+   validateRefreshToken,
+   authController.logout.bind(authController) as unknown as RequestHandler,
+);
 export default router;

@@ -17,7 +17,8 @@ export const Roles = {
    MANAGER: 'manager',
 } as const;
 
-export const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; // 7 days
+export const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; //  1 year
+export const MS_IN_2DAYS = 1000 * 60 * 60 * 24 * 2; // 2 days
 
 export const COOKIES_CONFIG = {
    domain: Config.HOST,

@@ -6,7 +6,7 @@ import createHttpError from 'http-errors';
 import path from 'path';
 import { inject, injectable } from 'inversify';
 import { User } from '../entity/User';
-import { MS_IN_YEAR, TYPES } from '../constants';
+import { MS_IN_2DAYS, MS_IN_YEAR, TYPES } from '../constants';
 import { RefreshToken } from '../entity/RefreshToken';
 import { Repository } from 'typeorm';
 
@@ -25,7 +25,7 @@ class TokenService {
          this.privateKey = readFileSync(path.join(__dirname, '../../certs/private.pem'));
          const accessToken = jwt.sign(payload, this.privateKey, {
             algorithm: 'RS256',
-            expiresIn: Config.EXPIRES_DATE_TOKEN as string,
+            expiresIn: MS_IN_2DAYS,
             issuer: Config.ISSUER_TOKEN as string,
          });
          return accessToken;

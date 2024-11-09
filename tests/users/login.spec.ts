@@ -35,7 +35,6 @@ describe('POST/auth/login', () => {
          // Act
          await request(app).post('/auth/register').send(registerData);
          const loginResponse = await request(app).post('/auth/login').send(loginData);
-
          // Assert
          expect(loginResponse.statusCode).toBe(200);
          expect(loginResponse.body).toHaveProperty('id');
