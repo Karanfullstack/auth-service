@@ -10,9 +10,9 @@ export const AppDataSource = new DataSource({
    username: Config.DB_USER,
    password: Config.DB_PASSWORD,
    database: Config.DB_NAME,
-   synchronize: process.env.NODE_ENV === 'dev',
+   synchronize: false,
    logging: false,
    entities: [User, RefreshToken],
    subscribers: [],
-   migrations: [],
+   migrations: ['src/migration/**/*.ts'],
 });

@@ -27,6 +27,5 @@ services:
       ports:
          - '5432:5432' # Map port 5432 for PostgreSQL
       restart: always
-
 volumes:
    mernpgdata:

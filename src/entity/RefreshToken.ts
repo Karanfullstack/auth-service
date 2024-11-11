@@ -10,7 +10,7 @@ import {
 
 import { User } from './User';
 
-@Entity()
+@Entity({ name: 'refreshTokens' })
 export class RefreshToken {
    @PrimaryGeneratedColumn()
    id: number;

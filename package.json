@@ -11,7 +11,11 @@
       "lint:fix": "eslint . --fix",
       "lint": "eslint .",
       "prepare": "husky",
-      "test": "jest --watch --runInBand"
+      "test": "jest --watch --runInBand",
+      "generate:migration": "typeorm-ts-node-commonjs migration:generate",
+      "migration:run": "typeorm-ts-node-commonjs migration:run",
+      "migration:revert": "typeorm-ts-node-commonjs migration:revert"
+      
    },
    "author": "",
    "license": "ISC",
