@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import {
+   Entity,
+   PrimaryGeneratedColumn,
+   Column,
+   CreateDateColumn,
+   UpdateDateColumn,
+   ManyToOne,
+} from 'typeorm';
 import { UserData } from '../types';
+import { Tenant } from './Tenant';
 
 @Entity({ name: 'users' })
 export class User implements UserData {
@@ -20,4 +28,13 @@ export class User implements UserData {
 
    @Column()
    role: string;
+
+   @ManyToOne(() => Tenant)
+   tenant: Tenant;
+
+   @UpdateDateColumn()
+   updateAt: number;
+
+   @CreateDateColumn()
+   createdAt: number;
 }
