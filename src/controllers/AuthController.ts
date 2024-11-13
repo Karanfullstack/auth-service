@@ -12,156 +12,162 @@ import { IAuthController } from './Interfaces/IAuthController';
 
 @injectable()
 class AuthController implements IAuthController {
-   private authService: IAuthService;
-   private tokenService: TokenService;
-   constructor(
-      @inject(TYPES.AuthService) authService: IAuthService,
-      @inject(TYPES.TokenService) tokenService: TokenService,
-   ) {
-      this.authService = authService;
-      this.tokenService = tokenService;
-   }
+    private authService: IAuthService;
+    private tokenService: TokenService;
+    constructor(
+        @inject(TYPES.AuthService) authService: IAuthService,
+        @inject(TYPES.TokenService) tokenService: TokenService,
+    ) {
+        this.authService = authService;
+        this.tokenService = tokenService;
+    }
 
-   async register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void> {
-      // @VALIDATE REQUEST
-      const result = validationResult(req);
-      if (!result.isEmpty()) {
-         res.status(400).json({ errors: result.array() });
-         return;
-      }
+    async register(req: RegistgerRequest, res: Response, next: NextFunction): Promise<void> {
+        // @VALIDATE REQUEST
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            res.status(400).json({ errors: result.array() });
+            return;
+        }
 
-      // @BODY
-      const { firstName, lastName, password, email } = req.body;
+        // @BODY
+        const { firstName, lastName, password, email } = req.body;
 
-      // @LOGGER DUBUG
-      logger.debug('New request to register', {
-         firstName,
-         lastName,
-         email,
-         password: '***',
-      });
-
-      try {
-         const user = await this.authService.create({
+        // @LOGGER DUBUG
+        logger.debug('New request to register', {
             firstName,
             lastName,
-            password,
             email,
-            role: Roles.CUSTOMER,
-         });
+            password: '***',
+        });
 
-         // logger
-         logger.info('User created successfully', { user: user.id });
+        try {
+            const user = await this.authService.create({
+                firstName,
+                lastName,
+                password,
+                email,
+                role: Roles.CUSTOMER,
+            });
 
-         // saving refreshToken
-         const newRefreshToken = await this.tokenService.persistRefreshToken(user);
+            // logger
+            logger.info('User created successfully', { user: user.id });
 
-         const payload = { sub: String(user.id), role: user.role };
+            // saving refreshToken
+            const newRefreshToken = await this.tokenService.persistRefreshToken(user);
 
-         // @AccessToken and RefreshToken
-         const accessToken = this.tokenService.generateAccessToken(payload);
-         const refreshToken = this.tokenService.generateRefreshToken(payload, newRefreshToken.id);
+            const payload = { sub: String(user.id), role: user.role };
 
-         // @SetCookies
-         this.saveRefreshTokenCookie(refreshToken, res);
-         this.saveAccessTokenCookie(accessToken, res);
+            // @AccessToken and RefreshToken
+            const accessToken = this.tokenService.generateAccessToken(payload);
+            const refreshToken = this.tokenService.generateRefreshToken(
+                payload,
+                newRefreshToken.id,
+            );
 
-         res.status(201).json({ ...user, success: true });
-      } catch (error) {
-         return next(error);
-      }
-   }
+            // @SetCookies
+            this.saveRefreshTokenCookie(refreshToken, res);
+            this.saveAccessTokenCookie(accessToken, res);
 
-   async login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
-      const result = validationResult(req);
-      if (!result.isEmpty()) {
-         res.status(400).json({ errors: result.array() });
-         return;
-      }
-      const { email, password } = req.body;
-      try {
-         const user = await this.authService.login({ email, password });
-         const payload = { sub: String(user.id), role: user.role };
-         const newRefreshToken = await this.tokenService.persistRefreshToken(user);
-         const accessToken = this.tokenService.generateAccessToken(payload);
-         const refreshToken = this.tokenService.generateRefreshToken(payload, newRefreshToken.id);
-
-         //@SetCookies
-         this.saveRefreshTokenCookie(refreshToken, res);
-         this.saveAccessTokenCookie(accessToken, res);
-
-         logger.info('User logged in successfully', { user: user.id });
-         res.status(200).json({ id: user.id, email: user.email });
-      } catch (error) {
-         return next(error);
-      }
-   }
-
-   // @PROTECTED
-   async self(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
-      try {
-         const user = await this.authService.self(Number(req.auth.sub));
-         res.status(200).json({ ...user, password: undefined });
-      } catch (error) {
-         next(error);
-      }
-   }
-
-   // @PROTECTED
-   async refresh(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
-      try {
-         const user = await this.authService.getUserById(Number(req.auth.sub));
-         if (!user) {
-            const error = createHttpError(404, 'User could not find user with refresh token.');
-            logger.error('User could not find user with refresh token in refresh endpoint');
+            res.status(201).json({ ...user, success: true });
+        } catch (error) {
             return next(error);
-         }
-         const payload: JwtPayload = { sub: req.auth.sub, role: req.auth.role };
+        }
+    }
 
-         const persistRefreshToken = await this.tokenService.persistRefreshToken(user);
-         logger.info('Refresh token persist with id', persistRefreshToken.id);
+    async login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            res.status(400).json({ errors: result.array() });
+            return;
+        }
+        const { email, password } = req.body;
+        try {
+            const user = await this.authService.login({ email, password });
+            const payload = { sub: String(user.id), role: user.role };
+            const newRefreshToken = await this.tokenService.persistRefreshToken(user);
+            const accessToken = this.tokenService.generateAccessToken(payload);
+            const refreshToken = this.tokenService.generateRefreshToken(
+                payload,
+                newRefreshToken.id,
+            );
 
-         const accessToken = this.tokenService.generateAccessToken(payload);
-         logger.info('Generated access token', accessToken.slice(0, 10));
-         const newRefreshToken = this.tokenService.generateRefreshToken(
-            payload,
-            persistRefreshToken.id,
-         );
-         logger.info('Generated new refresh token', accessToken.slice(0, 10));
+            //@SetCookies
+            this.saveRefreshTokenCookie(refreshToken, res);
+            this.saveAccessTokenCookie(accessToken, res);
 
-         // @Delete Old Refresh Token
-         await this.tokenService.deletePersitToken(req.auth.jti);
-         logger.info('Old refresh token removed');
+            logger.info('User logged in successfully', { user: user.id });
+            res.status(200).json({ id: user.id, email: user.email });
+        } catch (error) {
+            return next(error);
+        }
+    }
 
-         // @Save tokens to cookies
-         this.saveAccessTokenCookie(accessToken, res);
-         this.saveRefreshTokenCookie(newRefreshToken, res);
+    // @PROTECTED
+    async self(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await this.authService.self(Number(req.auth.sub));
+            res.status(200).json({ ...user, password: undefined });
+        } catch (error) {
+            next(error);
+        }
+    }
 
-         res.json({ success: true, refreshTokenID: Number(persistRefreshToken.id) });
-      } catch (error) {
-         next(error);
-      }
-   }
+    // @PROTECTED
+    async refresh(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await this.authService.getUserById(Number(req.auth.sub));
+            if (!user) {
+                const error = createHttpError(404, 'User could not find user with refresh token.');
+                logger.error('User could not find user with refresh token in refresh endpoint');
+                return next(error);
+            }
+            const payload: JwtPayload = { sub: req.auth.sub, role: req.auth.role };
 
-   // @PROTECTED
-   async logout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
-      try {
-         await this.tokenService.deletePersitToken(req.auth.jti);
-         res.clearCookie('accessToken');
-         res.clearCookie('refreshToken');
-         res.json({ success: true });
-      } catch (error) {
-         next(error);
-      }
-   }
+            const persistRefreshToken = await this.tokenService.persistRefreshToken(user);
+            logger.info('Refresh token persist with id', persistRefreshToken.id);
 
-   // @Set Cookies Methods
-   saveAccessTokenCookie(accessToken: string, res: Response): void {
-      res.cookie('accessToken', accessToken, COOKIES_CONFIG);
-   }
-   saveRefreshTokenCookie(refreshToken: string, res: Response): void {
-      res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
-   }
+            const accessToken = this.tokenService.generateAccessToken(payload);
+            logger.info('Generated access token', accessToken.slice(0, 10));
+            const newRefreshToken = this.tokenService.generateRefreshToken(
+                payload,
+                persistRefreshToken.id,
+            );
+            logger.info('Generated new refresh token', accessToken.slice(0, 10));
+
+            // @Delete Old Refresh Token
+            await this.tokenService.deletePersitToken(req.auth.jti);
+            logger.info('Old refresh token removed');
+
+            // @Save tokens to cookies
+            this.saveAccessTokenCookie(accessToken, res);
+            this.saveRefreshTokenCookie(newRefreshToken, res);
+
+            res.json({ success: true, refreshTokenID: Number(persistRefreshToken.id) });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // @PROTECTED
+    async logout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            await this.tokenService.deletePersitToken(req.auth.jti);
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+            res.json({ success: true });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // @Set Cookies Methods
+    saveAccessTokenCookie(accessToken: string, res: Response): void {
+        res.cookie('accessToken', accessToken, COOKIES_CONFIG);
+    }
+    saveRefreshTokenCookie(refreshToken: string, res: Response): void {
+        res.cookie('refreshToken', refreshToken, COOKIES_CONFIG);
+    }
 }
 
 export default AuthController;

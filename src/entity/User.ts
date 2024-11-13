@@ -1,40 +1,40 @@
 import {
-   Entity,
-   PrimaryGeneratedColumn,
-   Column,
-   CreateDateColumn,
-   UpdateDateColumn,
-   ManyToOne,
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    ManyToOne,
 } from 'typeorm';
 import { UserData } from '../types';
 import { Tenant } from './Tenant';
 
 @Entity({ name: 'users' })
 export class User implements UserData {
-   @PrimaryGeneratedColumn()
-   id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-   @Column()
-   firstName: string;
+    @Column()
+    firstName: string;
 
-   @Column()
-   lastName: string;
+    @Column()
+    lastName: string;
 
-   @Column()
-   password: string;
+    @Column()
+    password: string;
 
-   @Column()
-   email: string;
+    @Column()
+    email: string;
 
-   @Column()
-   role: string;
+    @Column()
+    role: string;
 
-   @ManyToOne(() => Tenant)
-   tenant: Tenant;
+    @ManyToOne(() => Tenant)
+    tenant: Tenant;
 
-   @UpdateDateColumn()
-   updateAt: number;
+    @UpdateDateColumn()
+    updateAt: number;
 
-   @CreateDateColumn()
-   createdAt: number;
+    @CreateDateColumn()
+    createdAt: number;
 }

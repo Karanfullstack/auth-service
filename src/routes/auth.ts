@@ -16,23 +16,23 @@ router.post('/login', loginValidator, authController.login.bind(authController))
 
 // @Protected Routes
 router.get(
-   '/self',
-   authenticate,
-   authController.self.bind(authController) as unknown as RequestHandler,
+    '/self',
+    authenticate,
+    authController.self.bind(authController) as unknown as RequestHandler,
 );
 
 // @Protected Route
 router.post(
-   '/refresh',
-   validateRefreshToken,
-   authController.refresh.bind(authController) as unknown as RequestHandler,
+    '/refresh',
+    validateRefreshToken,
+    authController.refresh.bind(authController) as unknown as RequestHandler,
 );
 
 // @Protected Route
 router.post(
-   '/logout',
-   authenticate,
-   validateRefreshToken,
-   authController.logout.bind(authController) as unknown as RequestHandler,
+    '/logout',
+    authenticate,
+    validateRefreshToken,
+    authController.logout.bind(authController) as unknown as RequestHandler,
 );
 export default router;

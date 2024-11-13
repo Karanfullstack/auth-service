@@ -1,29 +1,29 @@
 import {
-   Entity,
-   PrimaryGeneratedColumn,
-   Column,
-   BaseEntity,
-   UpdateDateColumn,
-   CreateDateColumn,
-   ManyToOne,
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    BaseEntity,
+    UpdateDateColumn,
+    CreateDateColumn,
+    ManyToOne,
 } from 'typeorm';
 
 import { User } from './User';
 
 @Entity({ name: 'refreshTokens' })
 export class RefreshToken {
-   @PrimaryGeneratedColumn()
-   id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-   @Column({ type: 'timestamp' })
-   expiresAt: Date;
+    @Column({ type: 'timestamp' })
+    expiresAt: Date;
 
-   @UpdateDateColumn()
-   updateAt: number;
+    @UpdateDateColumn()
+    updateAt: number;
 
-   @CreateDateColumn()
-   createdAt: number;
+    @CreateDateColumn()
+    createdAt: number;
 
-   @ManyToOne(() => User)
-   user: User;
+    @ManyToOne(() => User)
+    user: User;
 }

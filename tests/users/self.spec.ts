@@ -8,120 +8,120 @@ import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
 
 describe('GET /auth/self', () => {
-   let connection: DataSource;
-   let jwks: ReturnType<typeof createJWKS>;
-   beforeAll(async () => {
-      jwks = createJWKS('http://localhost:5501');
-      connection = await AppDataSource.initialize();
-   });
+    let connection: DataSource;
+    let jwks: ReturnType<typeof createJWKS>;
+    beforeAll(async () => {
+        jwks = createJWKS('http://localhost:5501');
+        connection = await AppDataSource.initialize();
+    });
 
-   beforeEach(async () => {
-      jwks.start();
-      await connection.dropDatabase();
-      await connection.synchronize();
-   });
+    beforeEach(async () => {
+        jwks.start();
+        await connection.dropDatabase();
+        await connection.synchronize();
+    });
 
-   afterEach(() => {
-      jwks.stop();
-   });
+    afterEach(() => {
+        jwks.stop();
+    });
 
-   afterAll(async () => {
-      await connection.destroy();
-   });
+    afterAll(async () => {
+        await connection.destroy();
+    });
 
-   describe('Given fields', () => {
-      it('should return 200 status code', async () => {
-         // Arrange
-         const userData = {
-            firstName: 'karan',
-            lastName: 'C',
-            email: 'karan@gmail.com',
-            password: 'secrets12',
-         };
-         // Act
-         const userRepository = new AuthRepository(connection.getRepository(User));
-         const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
-         // Generate token
+    describe('Given fields', () => {
+        it('should return 200 status code', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'karan',
+                lastName: 'C',
+                email: 'karan@gmail.com',
+                password: 'secrets12',
+            };
+            // Act
+            const userRepository = new AuthRepository(connection.getRepository(User));
+            const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            // Generate token
 
-         const accessToken = jwks.token({ sub: String(data.id), role: data.role });
-         const response = await request(app)
-            .get('/auth/self')
-            .set('Cookie', [`accessToken=${accessToken}`])
-            .send();
+            const accessToken = jwks.token({ sub: String(data.id), role: data.role });
+            const response = await request(app)
+                .get('/auth/self')
+                .set('Cookie', [`accessToken=${accessToken}`])
+                .send();
 
-         // Assert
-         expect(response.statusCode).toBe(200);
-      });
+            // Assert
+            expect(response.statusCode).toBe(200);
+        });
 
-      it('should return user data from token', async () => {
-         // Arrange
-         const userData = {
-            firstName: 'karan',
-            lastName: 'C',
-            email: 'karan@gmail.com',
-            password: 'secrets12',
-         };
-         // Act
-         const userRepository = new AuthRepository(connection.getRepository(User));
-         const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
-         // Generate token
+        it('should return user data from token', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'karan',
+                lastName: 'C',
+                email: 'karan@gmail.com',
+                password: 'secrets12',
+            };
+            // Act
+            const userRepository = new AuthRepository(connection.getRepository(User));
+            const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            // Generate token
 
-         const accessToken = jwks.token({ sub: String(data.id), role: data.role });
+            const accessToken = jwks.token({ sub: String(data.id), role: data.role });
 
-         // add token to cookie
-         const response = await request(app)
-            .get('/auth/self')
-            .set('Cookie', [`accessToken=${accessToken};`])
-            .send();
+            // add token to cookie
+            const response = await request(app)
+                .get('/auth/self')
+                .set('Cookie', [`accessToken=${accessToken};`])
+                .send();
 
-         // Assert if user id matches with response id
+            // Assert if user id matches with response id
 
-         expect(response.body.id).toBe(Number(data.id));
-      });
+            expect(response.body.id).toBe(Number(data.id));
+        });
 
-      it('should not have password field', async () => {
-         // Arrange
-         const userData = {
-            firstName: 'karan',
-            lastName: 'C',
-            email: 'karan@gmail.com',
-            password: 'secrets12',
-         };
-         // Act
-         const userRepository = new AuthRepository(connection.getRepository(User));
-         const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
-         // Generate token
+        it('should not have password field', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'karan',
+                lastName: 'C',
+                email: 'karan@gmail.com',
+                password: 'secrets12',
+            };
+            // Act
+            const userRepository = new AuthRepository(connection.getRepository(User));
+            const data = await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            // Generate token
 
-         const accessToken = jwks.token({ sub: String(data.id), role: data.role });
+            const accessToken = jwks.token({ sub: String(data.id), role: data.role });
 
-         // add token to cookie
-         const response = await request(app)
-            .get('/auth/self')
-            .set('Cookie', [`accessToken=${accessToken};`])
-            .send();
+            // add token to cookie
+            const response = await request(app)
+                .get('/auth/self')
+                .set('Cookie', [`accessToken=${accessToken};`])
+                .send();
 
-         // Assert if user id matches with response id
+            // Assert if user id matches with response id
 
-         expect(response.body).not.toHaveProperty('password');
-      });
-   });
+            expect(response.body).not.toHaveProperty('password');
+        });
+    });
 
-   describe('Fields are missing', () => {
-      it('should return 401 status code in case token is missing', async () => {
-         // Arrange
-         const userData = {
-            firstName: 'karan',
-            lastName: 'C',
-            email: 'karan@gmail.com',
-            password: 'secrets12',
-         };
-         // Act
-         const userRepository = new AuthRepository(connection.getRepository(User));
-         await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+    describe('Fields are missing', () => {
+        it('should return 401 status code in case token is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'karan',
+                lastName: 'C',
+                email: 'karan@gmail.com',
+                password: 'secrets12',
+            };
+            // Act
+            const userRepository = new AuthRepository(connection.getRepository(User));
+            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
 
-         const response = await request(app).get('/auth/self').send();
-         // Assert if user id matches with response id
-         expect(response.statusCode).toBe(401);
-      });
-   });
+            const response = await request(app).get('/auth/self').send();
+            // Assert if user id matches with response id
+            expect(response.statusCode).toBe(401);
+        });
+    });
 });

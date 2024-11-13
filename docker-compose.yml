@@ -1,31 +1,31 @@
 services:
-   auth-prep:
-      image: auth-service:dev
-      build:
-         context: .
-         dockerfile: ./docker/development/Dockerfile
-      ports:
-         - '5501:5501'
-      volumes:
-         - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
-         - /usr/src/app/node_modules # Exclude node_modules
-      stdin_open: true # Equivalent to -it
-      tty: true # Allocate a pseudo-TTY
-      restart: always
-      depends_on:
-         - postgres # Ensure PostgreSQL starts before auth-prep
+    auth-prep:
+        image: auth-service:dev
+        build:
+            context: .
+            dockerfile: ./docker/development/Dockerfile
+        ports:
+            - '5501:5501'
+        volumes:
+            - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
+            - /usr/src/app/node_modules # Exclude node_modules
+        stdin_open: true # Equivalent to -it
+        tty: true # Allocate a pseudo-TTY
+        restart: always
+        depends_on:
+            - postgres # Ensure PostgreSQL starts before auth-prep
 
-   postgres:
-      image: postgres:latest
-      container_name: mernpg-container
-      environment:
-         POSTGRES_USER: ${DB_USER}
-         POSTGRES_PASSWORD: ${DB_PASSWORD}
-         POSTGRES_DB: ${DB_NAME} # Optional: Set a default database
-      volumes:
-         - mernpgdata:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
-      ports:
-         - '5432:5432' # Map port 5432 for PostgreSQL
-      restart: always
+    postgres:
+        image: postgres:latest
+        container_name: mernpg-container
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME} # Optional: Set a default database
+        volumes:
+            - mernpgdata:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
+        ports:
+            - '5432:5432' # Map port 5432 for PostgreSQL
+        restart: always
 volumes:
-   mernpgdata:
+    mernpgdata:
