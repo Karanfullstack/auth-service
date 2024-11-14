@@ -4,10 +4,12 @@ import { DataSource } from 'typeorm';
 import app from '../../src/app';
 import { AppDataSource } from '../../src/config/data-source';
 import { Tenant } from '../../src/entity/Tenant';
+import { Roles } from '../../src/constants';
 
 describe('POST /tenants', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKS>;
+    let adminToken: string;
     beforeAll(async () => {
         jwks = createJWKS('http://localhost:5501');
         connection = await AppDataSource.initialize();
@@ -17,6 +19,10 @@ describe('POST /tenants', () => {
         jwks.start();
         await connection.dropDatabase();
         await connection.synchronize();
+        adminToken = jwks.token({
+            sub: '1',
+            role: Roles.ADMIN,
+        });
     });
 
     afterEach(() => {
@@ -32,13 +38,22 @@ describe('POST /tenants', () => {
             name: 'loream ipsum dolor sit amet, consectetur adipiscing elit',
             address: 'temp address',
         };
+
         it('should return 201 status code.', async () => {
-            const response = await request(app).post('/tenants').send(tenantData);
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
             expect(response.statusCode).toBe(201);
         });
+
         it('should create a tenant.', async () => {
             const tenantRepo = AppDataSource.getRepository(Tenant);
-            const response = await request(app).post('/tenants').send(tenantData);
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+
             const tenant = await tenantRepo.find();
             expect(tenant).toHaveLength(1);
             expect(tenant[0].name).toBe(tenantData.name);
@@ -50,16 +65,19 @@ describe('POST /tenants', () => {
     });
 
     describe('Fields are missing', () => {
-        const tenantData = {
-            name: 'elit',
-            address: 'add',
-        };
-
         it('should return 400 status code if request data is not propper.', async () => {
+            const tenantData = {
+                name: 'elit',
+                address: 'add',
+            };
             const tenantRepo = AppDataSource.getRepository(Tenant);
-            const response = await request(app).post('/tenants').send(tenantData);
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
 
             const tenant = await tenantRepo.find();
+
             expect(tenant).toHaveLength(0);
             expect(response.statusCode).toBe(400);
         });
@@ -70,9 +88,14 @@ describe('POST /tenants', () => {
                 address: 'addwfwwfffe',
             };
             const tenantRepo = AppDataSource.getRepository(Tenant);
-            const response = await request(app).post('/tenants').send(tenantData);
+
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
             const tenant = await tenantRepo.find();
             const message = response.body.errors.map((error: { msg: string }) => error.msg);
+
             expect(tenant).toHaveLength(0);
             expect(response.statusCode).toBe(400);
             expect(Array.isArray(response.body.errors)).toBeTruthy();
@@ -85,13 +108,51 @@ describe('POST /tenants', () => {
                 address: 'add',
             };
             const tenantRepo = AppDataSource.getRepository(Tenant);
-            const response = await request(app).post('/tenants').send(tenantData);
+
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
             const tenant = await tenantRepo.find();
             const message = response.body.errors.map((error: { msg: string }) => error.msg);
+
             expect(tenant).toHaveLength(0);
             expect(response.statusCode).toBe(400);
             expect(Array.isArray(response.body.errors)).toBeTruthy();
             expect(message).toContain('Lenght must be between 5 and 255');
+        });
+
+        it('should return 401 status code if user is not authenticated.', async () => {
+            const tenantData = {
+                name: 'elitefe',
+                address: 'addefef',
+            };
+            const tenantRepo = AppDataSource.getRepository(Tenant);
+            const response = await request(app).post('/tenants').send(tenantData);
+
+            const tenant = await tenantRepo.find();
+            expect(tenant).toHaveLength(0);
+            expect(response.statusCode).toBe(401);
+        });
+
+        it('should return 403 status code if user is not admin.', async () => {
+            const managerToken = jwks.token({ sub: '1', role: Roles.MANAGER });
+            const tenantData = {
+                name: 'elitefe',
+                address: 'addefef',
+            };
+            const tenantRepo = AppDataSource.getRepository(Tenant);
+            const response = await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${managerToken}`])
+                .send(tenantData);
+            console.log(response.body);
+            const errorMessage = response.body.errors.map((err: { msg: string }) => err.msg);
+            const tenant = await tenantRepo.find();
+            expect(tenant).toHaveLength(0);
+            expect(response.statusCode).toBe(403);
+            expect(Array.isArray(response.body.errors)).toBeTruthy();
+            expect(errorMessage).toContain('You do not have permission to access this resource');
         });
     });
 });
