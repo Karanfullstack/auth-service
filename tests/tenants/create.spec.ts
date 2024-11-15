@@ -62,6 +62,26 @@ describe('POST /tenants', () => {
             expect(typeof response.body.id).toBe('number');
             expect(response.body.id).toBe(tenant[0].id);
         });
+
+        it('should return all tenants', async () => {
+            const tenantData = {
+                name: 'loream ipsum dolor sit amet, consectetur adipiscing elit',
+                address: 'temp address',
+            };
+            await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+
+            await request(app).get('/tenants').send();
+
+            const tenantRepo = await AppDataSource.getRepository(Tenant).find();
+
+            expect(tenantRepo).toHaveLength(1);
+            expect(tenantRepo[0].address).toContain('temp address');
+
+            // FIXME COMPLETE THE GET ALL TENANTS
+        });
     });
 
     describe('Fields are missing', () => {
@@ -146,7 +166,7 @@ describe('POST /tenants', () => {
                 .post('/tenants')
                 .set('Cookie', [`accessToken=${managerToken}`])
                 .send(tenantData);
-            console.log(response.body);
+
             const errorMessage = response.body.errors.map((err: { msg: string }) => err.msg);
             const tenant = await tenantRepo.find();
             expect(tenant).toHaveLength(0);

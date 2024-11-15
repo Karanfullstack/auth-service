@@ -13,6 +13,10 @@ class TenantRepository implements ITenantRepository {
     async save(data: ITenant): Promise<Tenant> {
         return await this.tenantRepo.save(data);
     }
+
+    async tenantQueryBuilder(): Promise<Repository<Tenant>> {
+        return this.tenantRepo;
+    }
 }
 
 export default TenantRepository;

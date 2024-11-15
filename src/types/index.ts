@@ -47,3 +47,9 @@ export interface ITenant {
     name: string;
     address: string;
 }
+
+export interface ITeanantQuery {
+    q: string;
+    perPage: number;
+    currentPage: number;
+}

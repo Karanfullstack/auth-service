@@ -1,10 +1,10 @@
-import { NextFunction, Response } from 'express';
-import { CreateTenantRequest } from '../types';
+import { NextFunction, Response, Request } from 'express';
+import { CreateTenantRequest, ITeanantQuery } from '../types';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../constants';
 import { ITenantService } from '../services/Interfaces/ITenantService';
 import { ITenantController } from './Interfaces/ITenantConroller';
-import { validationResult } from 'express-validator';
+import { matchedData, validationResult } from 'express-validator';
 import logger from '../config/logger';
 
 @injectable()
@@ -22,6 +22,22 @@ class TenantController implements ITenantController {
             const tenant = await this.tenantService.create({ name, address });
             logger.info(`Tenant created: ${tenant.id}`);
             res.status(201).json({ id: tenant.id });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const validate = matchedData(req, { onlyValidData: true });
+
+        try {
+            const [tenants, count] = await this.tenantService.getAll(validate as ITeanantQuery);
+            res.json({
+                currentPage: validate.currentPage as number,
+                perPage: validate.perPage as number,
+                total: count,
+                data: tenants,
+            });
         } catch (error) {
             next(error);
         }
