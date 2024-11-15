@@ -20,4 +20,11 @@ router.post(
 
 router.get('/', queryValidator, tenantController.getAll.bind(tenantController));
 
+router.delete(
+    '/:id',
+    authenticate,
+    canAccess([Roles.ADMIN]) as unknown as RequestHandler,
+    tenantController.deleteOne.bind(tenantController),
+);
+
 export default router;

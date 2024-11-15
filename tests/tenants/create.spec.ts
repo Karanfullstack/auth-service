@@ -79,8 +79,25 @@ describe('POST /tenants', () => {
 
             expect(tenantRepo).toHaveLength(1);
             expect(tenantRepo[0].address).toContain('temp address');
+        });
 
-            // FIXME COMPLETE THE GET ALL TENANTS
+        it('should delete a tenant form database', async () => {
+            // create a tenant
+            await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+
+            await request(app).get('/tenants').send();
+
+            const deleteResponse = await request(app)
+                .delete('/tenants/1')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send();
+
+            const tenantRepo = await AppDataSource.getRepository(Tenant).find();
+            expect(tenantRepo).toHaveLength(0);
+            expect(deleteResponse.statusCode).toBe(204);
         });
     });
 
@@ -173,6 +190,32 @@ describe('POST /tenants', () => {
             expect(response.statusCode).toBe(403);
             expect(Array.isArray(response.body.errors)).toBeTruthy();
             expect(errorMessage).toContain('You do not have permission to access this resource');
+        });
+
+        it('should return 404 status code if tenant id doesn not exists', async () => {
+            const tenantData = {
+                name: 'loream ipsum dolor sit amet, consectetur adipiscing elit',
+                address: 'temp address',
+            };
+            // create a tenant
+            await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+
+            await request(app).get('/tenants').send();
+
+            const deleteResponse = await request(app)
+                .delete('/tenants/2')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send();
+            const errMessage = deleteResponse.body.errors.map((err: { msg: string }) => err.msg);
+            const tenantRepo = await AppDataSource.getRepository(Tenant).find();
+            expect(tenantRepo).toHaveLength(1);
+            expect(deleteResponse.statusCode).toBe(404);
+            expect(Array.isArray(deleteResponse.body.errors)).toBeTruthy();
+            expect(deleteResponse.body).toHaveProperty('errors');
+            expect(errMessage).toContain('Tenant not found to be deleted');
         });
     });
 });

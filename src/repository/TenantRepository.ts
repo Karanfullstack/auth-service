@@ -1,11 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { FindOneOptions, Repository } from 'typeorm';
-import { User } from '../entity/User';
-import { ITenant, UserData } from '../types';
-import { IAuthRepository } from './Interfaces/IAuthRepoistory';
 import { TYPES } from '../constants';
-import { ITenantRepository } from './Interfaces/ITenantRepository';
 import { Tenant } from '../entity/Tenant';
+import { ITenant } from '../types';
+import { ITenantRepository } from './Interfaces/ITenantRepository';
 
 @injectable()
 class TenantRepository implements ITenantRepository {
@@ -14,6 +12,13 @@ class TenantRepository implements ITenantRepository {
         return await this.tenantRepo.save(data);
     }
 
+    async deleteTenant(id: number): Promise<void> {
+        const deleted = this.tenantRepo.delete(id);
+    }
+
+    async findOne(payload: FindOneOptions<Tenant>): Promise<Tenant | null> {
+        return this.tenantRepo.findOne(payload);
+    }
     async tenantQueryBuilder(): Promise<Repository<Tenant>> {
         return this.tenantRepo;
     }

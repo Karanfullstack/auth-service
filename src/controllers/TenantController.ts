@@ -38,6 +38,18 @@ class TenantController implements ITenantController {
                 total: count,
                 data: tenants,
             });
+            logger.info('Tenants Fetched', tenants);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteOne(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const id = req.params.id;
+        try {
+            await this.tenantService.deleteOne(Number(id));
+            logger.info('Tenant deleted');
+            res.status(204).json();
         } catch (error) {
             next(error);
         }
