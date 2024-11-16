@@ -12,15 +12,28 @@ class TenantRepository implements ITenantRepository {
         return await this.tenantRepo.save(data);
     }
 
-    async deleteTenant(id: number): Promise<void> {
-        const deleted = this.tenantRepo.delete(id);
+    async deleteTenant(id: number): Promise<Tenant> {
+        const tenant = await this.tenantRepo.findOne({ where: { id: id } });
+        if (!tenant) {
+            throw new Error('Tenant id is not valid to be deleted');
+        }
+        await this.tenantRepo.delete(id);
+        return tenant;
     }
 
     async findOne(payload: FindOneOptions<Tenant>): Promise<Tenant | null> {
-        return this.tenantRepo.findOne(payload);
+        return await this.tenantRepo.findOne(payload);
     }
     async tenantQueryBuilder(): Promise<Repository<Tenant>> {
         return this.tenantRepo;
+    }
+    async updateOne(id: number, data: ITenant): Promise<Tenant> {
+        await this.tenantRepo.update(id, data);
+        const tenant = await this.tenantRepo.findOne({ where: { id: id } });
+        if (!tenant) {
+            throw new Error('Tenant id is not valid for update');
+        }
+        return tenant;
     }
 }
 

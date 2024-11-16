@@ -32,13 +32,32 @@ class TenantService implements ITenantService {
         return [finalResult, count];
     }
 
-    async deleteOne(id: number): Promise<void> {
+    async deleteOne(id: number): Promise<Tenant> {
         const findTenant = await this.tenantRepo.findOne({ where: { id: id } });
         if (!findTenant) {
             const error = createHttpError(404, 'Tenant not found to be deleted');
             throw error;
         }
-        return this.tenantRepo.deleteTenant(id);
+        return await this.tenantRepo.deleteTenant(id);
+    }
+
+    async updateOne(id: number, data: ITenant): Promise<Tenant> {
+        const findTeant = await this.tenantRepo.findOne({ where: { id: id } });
+        if (!findTeant) {
+            const error = createHttpError(404, 'Tenant not found to be updated');
+            throw error;
+        }
+
+        await this.tenantRepo.updateOne(id, data);
+        return findTeant;
+    }
+    async getOne(id: number): Promise<Tenant> {
+        const tenant = await this.tenantRepo.findOne({ where: { id: id } });
+        if (!tenant) {
+            const error = createHttpError(404, 'Tenant not found');
+            throw error;
+        }
+        return tenant;
     }
 }
 

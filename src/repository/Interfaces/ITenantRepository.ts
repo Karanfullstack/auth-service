@@ -5,8 +5,9 @@ import { ITenant } from '../../types';
 export interface ITenantRepository {
     save(data: ITenant): Promise<Tenant>;
     tenantQueryBuilder(): Promise<Repository<Tenant>>;
-    deleteTenant(id: number): Promise<void>;
+    deleteTenant(id: number): Promise<Tenant>;
     findOne(payload: FindOneOptions<Tenant>): Promise<Tenant | null>;
+    updateOne(id: number, data: ITenant): Promise<Tenant>;
 }
 
 export interface ITenantDelete {

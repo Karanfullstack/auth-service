@@ -73,15 +73,18 @@ describe('POST /tenants', () => {
                 .set('Cookie', [`accessToken=${adminToken}`])
                 .send(tenantData);
 
-            await request(app).get('/tenants').send();
+            const allTenants = await request(app).get('/tenants').send();
 
             const tenantRepo = await AppDataSource.getRepository(Tenant).find();
 
             expect(tenantRepo).toHaveLength(1);
             expect(tenantRepo[0].address).toContain('temp address');
+            expect(allTenants.body).toHaveProperty('currentPage');
+            expect(allTenants.body).toHaveProperty('perPage');
+            expect(allTenants.body).toHaveProperty('data');
         });
 
-        it('should delete a tenant form database', async () => {
+        it('should delete a tenant from database', async () => {
             // create a tenant
             await request(app)
                 .post('/tenants')
@@ -97,7 +100,40 @@ describe('POST /tenants', () => {
 
             const tenantRepo = await AppDataSource.getRepository(Tenant).find();
             expect(tenantRepo).toHaveLength(0);
-            expect(deleteResponse.statusCode).toBe(204);
+            expect(deleteResponse.statusCode).toBe(200);
+        });
+
+        it('should update a single tenant', async () => {
+            const updateData = {
+                address: 'some street are find',
+                name: 'new burger restaurant',
+            };
+            await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+
+            const getResponse = await request(app)
+                .patch('/tenants/1')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(updateData);
+
+            const tenantRepo = AppDataSource.getRepository(Tenant);
+            const tenant = await tenantRepo.findOne({ where: { id: 1 } });
+            expect(tenant?.name).toBe(updateData.name);
+            expect(tenant?.address).toBe(updateData.address);
+        });
+
+        it('should return single tenant', async () => {
+            await request(app)
+                .post('/tenants')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send(tenantData);
+            const tenant = await request(app).get('/tenants/1').send();
+            expect(tenant.statusCode).toBe(200);
+            expect(tenant.body).toHaveProperty('name');
+            expect(tenant.body).toHaveProperty('address');
+            expect(tenant.body).toHaveProperty('id');
         });
     });
 
@@ -192,7 +228,7 @@ describe('POST /tenants', () => {
             expect(errorMessage).toContain('You do not have permission to access this resource');
         });
 
-        it('should return 404 status code if tenant id doesn not exists', async () => {
+        it('should return 404 status code if tenant id does not exist to be deleted', async () => {
             const tenantData = {
                 name: 'loream ipsum dolor sit amet, consectetur adipiscing elit',
                 address: 'temp address',
