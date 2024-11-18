@@ -4,7 +4,7 @@
    "description": "A user management service",
    "main": "index.js",
    "scripts": {
-      "dev": "cross-env NODE_ENV=dev nodemon src/server.ts",
+      "dev": "cross-env NODE_ENV=test nodemon src/server.ts",
       "build": "npx tsc",
       "format:check": "prettier --check .",
       "format:fix": "prettier --write .",
@@ -14,7 +14,8 @@
       "test": "jest --watch --runInBand",
       "generate:migration": "typeorm-ts-node-commonjs migration:generate",
       "migration:run": "typeorm-ts-node-commonjs migration:run",
-      "migration:revert": "typeorm-ts-node-commonjs migration:revert"
+      "migration:revert": "typeorm-ts-node-commonjs migration:revert",
+      "migration:create": "typeorm-ts-node-commonjs migration:create"
       
    },
    "author": "",

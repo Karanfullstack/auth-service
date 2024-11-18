@@ -20,7 +20,7 @@ class TenantService implements ITenantService {
         );
         if (query.q) {
             const searchTerm = `%${query.q}%`;
-            queryBuilder.where('CONCAT(tenant.name, " ", tenant.address) ILIKE:q', {
+            queryBuilder.where('CONCAT(tenant.name , tenant.address) ILike :q', {
                 q: searchTerm,
             });
         }

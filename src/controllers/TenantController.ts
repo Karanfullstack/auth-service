@@ -1,15 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { matchedData, validationResult } from 'express-validator';
+import createHttpError from 'http-errors';
 import { inject, injectable } from 'inversify';
-import { AppDataSource } from '../config/data-source';
 import logger from '../config/logger';
 import { TYPES } from '../constants';
-import { Tenant } from '../entity/Tenant';
 import { ITenantService } from '../services/Interfaces/ITenantService';
 import { CreateTenantRequest, ITeanantQuery } from '../types';
 import { ITenantController } from './Interfaces/ITenantConroller';
-import createHttpError from 'http-errors';
-import { log } from 'console';
 
 @injectable()
 class TenantController implements ITenantController {

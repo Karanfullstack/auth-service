@@ -23,13 +23,15 @@ import { ITenantController } from '../controllers/Interfaces/ITenantConroller';
 import TenantController from '../controllers/TenantController';
 import { ITenantService } from '../services/Interfaces/ITenantService';
 import TenantService from '../services/TenantService';
+import { IUserController } from '../controllers/Interfaces/IUserController';
+import UserController from '../controllers/UserController';
 
 const container = new Container();
 
 // @CONTROLLERS
 container.bind<IAuthController>(TYPES.AuthController).to(AuthController);
 container.bind<ITenantController>(TYPES.TenantController).to(TenantController);
-
+container.bind<IUserController>(TYPES.UserController).to(UserController);
 // @SERVICES
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<ITenantService>(TYPES.TenantService).to(TenantService);

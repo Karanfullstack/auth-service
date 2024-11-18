@@ -1,12 +1,15 @@
 import { Request } from 'express';
 import { User } from '../entity/User';
+import { Tenant } from '../entity/Tenant';
 
 export interface UserData {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
-    role: string;
+    role?: string;
+    tenantID?: number | null;
+    tenant?: { id: number } | undefined | null;
 }
 export interface RegistgerRequest extends Request {
     body: Omit<UserData, 'role'>;
@@ -24,6 +27,10 @@ export interface AuthRequest extends Request {
         sub: string;
         role: string;
         jti: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        tenant: string;
     };
 }
 
@@ -52,4 +59,8 @@ export interface ITeanantQuery {
     q: string;
     perPage: number;
     currentPage: number;
+}
+
+export interface IUserCreateRequest extends Request {
+    body: UserData;
 }

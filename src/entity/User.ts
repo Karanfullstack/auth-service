@@ -30,7 +30,7 @@ export class User implements UserData {
     role: string;
 
     @ManyToOne(() => Tenant)
-    tenant: Tenant;
+    tenant: Tenant | undefined | null;
 
     @UpdateDateColumn()
     updateAt: number;

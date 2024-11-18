@@ -56,7 +56,14 @@ class AuthController implements IAuthController {
             // saving refreshToken
             const newRefreshToken = await this.tokenService.persistRefreshToken(user);
 
-            const payload = { sub: String(user.id), role: user.role };
+            const payload: JwtPayload = {
+                sub: String(user.id),
+                name: user.firstName,
+                lastName: user.lastName,
+                tenant: user.tenant ? String(user.tenant.id) : '',
+                email: user.email,
+                role: user.role,
+            };
 
             // @AccessToken and RefreshToken
             const accessToken = this.tokenService.generateAccessToken(payload);
@@ -69,7 +76,7 @@ class AuthController implements IAuthController {
             this.saveRefreshTokenCookie(refreshToken, res);
             this.saveAccessTokenCookie(accessToken, res);
 
-            res.status(201).json({ ...user, success: true });
+            res.status(201).json({ ...user, password: undefined, success: true });
         } catch (error) {
             return next(error);
         }
@@ -84,7 +91,16 @@ class AuthController implements IAuthController {
         const { email, password } = req.body;
         try {
             const user = await this.authService.login({ email, password });
-            const payload = { sub: String(user.id), role: user.role };
+
+            const payload: JwtPayload = {
+                sub: String(user.id),
+                name: user.firstName,
+                lastName: user.lastName,
+                tenant: user.tenant ? String(user.tenant.id) : '',
+                email: user.email,
+                role: user.role,
+            };
+
             const newRefreshToken = await this.tokenService.persistRefreshToken(user);
             const accessToken = this.tokenService.generateAccessToken(payload);
             const refreshToken = this.tokenService.generateRefreshToken(
@@ -97,7 +113,7 @@ class AuthController implements IAuthController {
             this.saveAccessTokenCookie(accessToken, res);
 
             logger.info('User logged in successfully', { user: user.id });
-            res.status(200).json({ id: user.id, email: user.email });
+            res.status(200).json({ ...user, password: undefined });
         } catch (error) {
             return next(error);
         }
@@ -122,7 +138,14 @@ class AuthController implements IAuthController {
                 logger.error('User could not find user with refresh token in refresh endpoint');
                 return next(error);
             }
-            const payload: JwtPayload = { sub: req.auth.sub, role: req.auth.role };
+            const payload: JwtPayload = {
+                sub: req.auth.sub,
+                email: req.auth.email,
+                tenant: req.auth.tenant,
+                firstName: req.auth.firstName,
+                lastName: req.auth.lastName,
+                role: req.auth.role,
+            };
 
             const persistRefreshToken = await this.tokenService.persistRefreshToken(user);
             logger.info('Refresh token persist with id', persistRefreshToken.id);

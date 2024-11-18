@@ -13,6 +13,7 @@ export const TYPES = {
     TenantRepository: Symbol.for('TenantRepository'),
     TenantController: Symbol.for('TenantController'),
     TenantService: Symbol.for('TenantService'),
+    UserController: Symbol.for('UserController'),
 };
 
 export const Roles = {

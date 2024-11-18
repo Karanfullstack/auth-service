@@ -2,16 +2,18 @@ import 'reflect-metadata';
 import express, { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import logger from './config/logger';
-import userRouter from './routes/auth';
+import authRouter from './routes/auth';
 import tenantRouter from './routes/tenant';
+import userRouter from './routes/user';
 import cookieParser from 'cookie-parser';
 const app = express();
 app.use(express.static('public'));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/auth', userRouter);
+app.use('/auth', authRouter);
 app.use('/tenants', tenantRouter);
+app.use('/users', userRouter);
 
 app.use((error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
     logger.error(error.message);

@@ -19,7 +19,14 @@ class AuthService implements IAuthService {
         this.credentialService = credentialService;
     }
     // Register a new user
-    async create({ firstName, lastName, password, email, role }: UserData): Promise<User> {
+    async create({
+        firstName,
+        lastName,
+        password,
+        email,
+        role,
+        tenantID,
+    }: UserData): Promise<User> {
         const user = await this.authRepository.findByEmail(email);
         if (user) {
             const err = createHttpError(400, 'User already exists');
@@ -27,18 +34,31 @@ class AuthService implements IAuthService {
         }
 
         const hashed = await this.credentialService.generateHash(password);
-        const newUser = new User();
-        newUser.firstName = firstName;
-        newUser.lastName = lastName;
-        newUser.password = hashed;
-        newUser.email = email;
-        newUser.role = role;
 
-        return this.authRepository.save(newUser);
+        const newUser = await this.authRepository.save({
+            firstName,
+            lastName,
+            password: hashed,
+            email,
+            role,
+            tenant: tenantID ? { id: tenantID } : null,
+        });
+
+        const data = await this.authRepository.findOne({
+            where: { id: newUser.id },
+            relations: { tenant: true },
+        });
+        if (!data) {
+            throw new Error('error while creating a user');
+        }
+        return data;
     }
 
     async login({ email, password }: UserData): Promise<User> {
-        const user = await this.authRepository.findByEmail(email);
+        const user = await this.authRepository.findOne({
+            where: { email },
+            relations: { tenant: true },
+        });
 
         if (!user) {
             const err = createHttpError(401, 'Unauthorized');
@@ -64,7 +84,7 @@ class AuthService implements IAuthService {
     }
 
     async getUserById(id: number): Promise<User | null> {
-        return this.authRepository.findByID(id);
+        return this.authRepository.findOne({ where: { id }, relations: { tenant: true } });
     }
 }
 
