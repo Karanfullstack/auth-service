@@ -29,7 +29,7 @@ export class User implements UserData {
     @Column()
     role: string;
 
-    @ManyToOne(() => Tenant)
+    @ManyToOne(() => Tenant, { onDelete: 'CASCADE' })
     tenant: Tenant | undefined | null;
 
     @UpdateDateColumn()

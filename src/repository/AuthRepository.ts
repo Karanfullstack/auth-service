@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, QueryBuilder, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from '../entity/User';
-import { UserData } from '../types';
+import { IUpdateUser, UserData } from '../types';
 import { IAuthRepository } from './Interfaces/IAuthRepoistory';
 import { TYPES } from '../constants';
 
@@ -19,6 +19,27 @@ class AuthRepository implements IAuthRepository {
     }
     async findByID(id: number): Promise<User | null> {
         return await this.userRepository.findOneBy({ id });
+    }
+    async deleteByID(id: number): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { id: id } });
+        if (!user) {
+            throw new Error('User id is not valid to be deleted');
+        }
+        await this.userRepository.delete(id);
+        return user;
+    }
+
+    async queryBuilder(user: string): Promise<SelectQueryBuilder<User>> {
+        return this.userRepository.createQueryBuilder(user);
+    }
+
+    async update(id: number, user: IUpdateUser): Promise<User | null> {
+        const payload = await this.userRepository.findOne({ where: { id: id } });
+        if (!user) {
+            throw new Error('User id is not valid to be deleted');
+        }
+        await this.userRepository.update(id, user);
+        return payload;
     }
 }
 

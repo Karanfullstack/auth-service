@@ -30,6 +30,7 @@ class TenantRepository implements ITenantRepository {
     async updateOne(id: number, data: ITenant): Promise<Tenant> {
         await this.tenantRepo.update(id, data);
         const tenant = await this.tenantRepo.findOne({ where: { id: id } });
+
         if (!tenant) {
             throw new Error('Tenant id is not valid for update');
         }

@@ -61,6 +61,19 @@ export interface ITeanantQuery {
     currentPage: number;
 }
 
+export interface IUserQuery {
+    q: string;
+    perPage: number;
+    currentPage: number;
+    role: string;
+}
+
 export interface IUserCreateRequest extends Request {
     body: UserData;
+}
+
+export type IUpdateUser = Omit<UserData, 'password' | 'email'>;
+
+export interface IUpdateUserRequest extends Request {
+    body: IUpdateUser;
 }

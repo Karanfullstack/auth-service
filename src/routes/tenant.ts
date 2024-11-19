@@ -27,9 +27,6 @@ router.delete(
     tenantController.deleteOne.bind(tenantController),
 );
 
-// @Public Routes
-router.get('/', queryValidator, tenantController.getAll.bind(tenantController));
-
 router.patch(
     '/:id',
     authenticate,
@@ -37,6 +34,9 @@ router.patch(
     canAccess([Roles.ADMIN]) as unknown as RequestHandler,
     tenantController.updateOne.bind(tenantController),
 );
+
+// @Public Routes
+router.get('/', queryValidator, tenantController.getAll.bind(tenantController));
 
 router.get('/:id', tenantController.getOne.bind(tenantController));
 

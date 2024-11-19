@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { UserData } from '../types';
+import { IUpdateUser, IUserQuery, UserData } from '../types';
 import { IAuthService } from './Interfaces/IAuthService';
 import { IAuthRepository } from '../repository/Interfaces/IAuthRepoistory';
 import { User } from '../entity/User';
@@ -85,6 +85,46 @@ class AuthService implements IAuthService {
 
     async getUserById(id: number): Promise<User | null> {
         return this.authRepository.findOne({ where: { id }, relations: { tenant: true } });
+    }
+
+    async deleteUser(id: number): Promise<User | null> {
+        return await this.authRepository.deleteByID(id);
+    }
+
+    async getAllUsers(query: IUserQuery): Promise<[User[], number]> {
+        const queryBuilder = await this.authRepository.queryBuilder('user');
+        if (query.q) {
+            const searchTerm = `%${query.q}%`;
+            queryBuilder.where(`CONCAT(user.firstName, ' ', user.lastName) ILike :q`, {
+                q: searchTerm,
+            });
+        }
+
+        if (query.role) {
+            queryBuilder.andWhere('user.role = :role', {
+                role: query.role,
+            });
+        }
+
+        const result = await queryBuilder
+            .leftJoinAndSelect('user.tenant', 'tenant')
+            .skip((query.currentPage - 1) * query.perPage)
+            .take(query.perPage)
+            .orderBy('user.id', 'DESC')
+            .getManyAndCount();
+
+        return result;
+    }
+
+    async updateUser(payload: IUpdateUser, id: number): Promise<User | null> {
+        await this.authRepository.update(id, {
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            role: payload.role,
+            tenant: payload.tenantID ? { id: payload.tenantID } : null,
+        });
+        const updatedUser = await this.authRepository.findByID(id);
+        return updatedUser;
     }
 }
 
