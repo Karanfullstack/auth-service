@@ -79,7 +79,7 @@ class UserController implements IUserController {
             currentPage: validate.currentPage,
             perPage: validate.perPage,
             total: count,
-            data: users,
+            data: [...users],
         });
     }
     async update(req: IUpdateUserRequest, res: Response, next: NextFunction): Promise<void> {

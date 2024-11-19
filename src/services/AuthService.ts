@@ -95,9 +95,11 @@ class AuthService implements IAuthService {
         const queryBuilder = await this.authRepository.queryBuilder('user');
         if (query.q) {
             const searchTerm = `%${query.q}%`;
-            queryBuilder.where(`CONCAT(user.firstName, ' ', user.lastName) ILike :q`, {
-                q: searchTerm,
-            });
+            queryBuilder
+                .where(`CONCAT(user.firstName, ' ', user.lastName) ILike :q`, {
+                    q: searchTerm,
+                })
+                .orWhere('user.email ILike :q', { q: searchTerm });
         }
 
         if (query.role) {

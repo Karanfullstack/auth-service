@@ -38,6 +38,11 @@ router.patch(
 // @Public Routes
 router.get('/', queryValidator, tenantController.getAll.bind(tenantController));
 
-router.get('/:id', tenantController.getOne.bind(tenantController));
+router.get(
+    '/:id',
+    authenticate,
+    canAccess([Roles.ADMIN]) as unknown as RequestHandler,
+    tenantController.getOne.bind(tenantController),
+);
 
 export default router;
