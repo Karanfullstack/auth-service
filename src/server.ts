@@ -6,7 +6,7 @@ import { AppDataSource } from './config/data-source';
 const startServer = async () => {
     try {
         logger.info('Database ' + Config.DB_NAME);
-        if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'prod') {
+        if (process.env.NODE_ENV === 'dev') {
             const database = await AppDataSource.initialize();
         }
         logger.info('Database is connected sucessfully.');

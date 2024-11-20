@@ -129,7 +129,10 @@ describe('POST /tenants', () => {
                 .post('/tenants')
                 .set('Cookie', [`accessToken=${adminToken}`])
                 .send(tenantData);
-            const tenant = await request(app).get('/tenants/1').send();
+            const tenant = await request(app)
+                .get('/tenants/1')
+                .set('Cookie', [`accessToken=${adminToken}`])
+                .send();
             expect(tenant.statusCode).toBe(200);
             expect(tenant.body).toHaveProperty('name');
             expect(tenant.body).toHaveProperty('address');

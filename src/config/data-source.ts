@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { Config } from '.';
-
+import path from 'node:path';
 export const AppDataSource = new DataSource({
     type: 'postgres',
     host: Config.DB_HOST,
@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     database: Config.DB_NAME,
     synchronize: true,
     logging: false,
-    entities: ['src/entity/*.ts'],
+    entities: ['src/entity/*.{ts,js}'],
     subscribers: [],
-    migrations: ['src/migration/**/*.ts'],
+    migrations: ['src/migration/**/*.{ts,js}'],
 });
