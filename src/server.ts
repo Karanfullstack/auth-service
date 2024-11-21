@@ -6,9 +6,9 @@ import { AppDataSource } from './config/data-source';
 const startServer = async () => {
     try {
         logger.info('Database ' + Config.DB_NAME);
-        if (process.env.NODE_ENV === 'dev') {
-            const database = await AppDataSource.initialize();
-        }
+
+        await AppDataSource.initialize();
+
         logger.info('Database is connected sucessfully.');
         app.listen(Config.PORT, () => {
             logger.info(`Server is running at http://${Config.HOST}:${Config.PORT}`);
