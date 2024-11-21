@@ -29,6 +29,7 @@ export default checkSchema({
         errorMessage: 'Tenant id is required!',
         trim: true,
         custom: {
+            // eslint-disable-next-line @typescript-eslint/require-await
             options: async (value: string, { req }) => {
                 const role = (req as IUpdateUserRequest).body.role;
                 if (role === 'admin') {

@@ -92,7 +92,7 @@ class AuthService implements IAuthService {
     }
 
     async getAllUsers(query: IUserQuery): Promise<[User[], number]> {
-        const queryBuilder = await this.authRepository.queryBuilder('user');
+        const queryBuilder = this.authRepository.queryBuilder('user');
         if (query.q) {
             const searchTerm = `%${query.q}%`;
             queryBuilder

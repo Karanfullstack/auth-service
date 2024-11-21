@@ -15,9 +15,8 @@ class TenantService implements ITenantService {
     }
 
     async getAll(query: ITeanantQuery): Promise<[Tenant[], number]> {
-        const queryBuilder = (await this.tenantRepo.tenantQueryBuilder()).createQueryBuilder(
-            'tenant',
-        );
+        const queryBuilder = this.tenantRepo.tenantQueryBuilder().createQueryBuilder('tenant');
+
         if (query.q) {
             const searchTerm = `%${query.q}%`;
             queryBuilder.where('CONCAT(tenant.name , tenant.address) ILike :q', {

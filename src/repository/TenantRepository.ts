@@ -24,7 +24,7 @@ class TenantRepository implements ITenantRepository {
     async findOne(payload: FindOneOptions<Tenant>): Promise<Tenant | null> {
         return await this.tenantRepo.findOne(payload);
     }
-    async tenantQueryBuilder(): Promise<Repository<Tenant>> {
+    tenantQueryBuilder(): Repository<Tenant> {
         return this.tenantRepo;
     }
     async updateOne(id: number, data: ITenant): Promise<Tenant> {

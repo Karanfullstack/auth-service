@@ -29,7 +29,7 @@ class AuthRepository implements IAuthRepository {
         return user;
     }
 
-    async queryBuilder(user: string): Promise<SelectQueryBuilder<User>> {
+    queryBuilder(user: string): SelectQueryBuilder<User> {
         return this.userRepository.createQueryBuilder(user);
     }
 

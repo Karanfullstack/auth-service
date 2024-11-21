@@ -8,6 +8,6 @@ export interface IAuthRepository {
     findOne(payload: FindOneOptions<User>): Promise<User | null>;
     findByID(id: number): Promise<User | null>;
     deleteByID(id: number): Promise<User | null>;
-    queryBuilder(user: string): Promise<SelectQueryBuilder<User>>;
+    queryBuilder(user: string): SelectQueryBuilder<User>;
     update(id: number, user: IUpdateUser): Promise<User | null>;
 }
