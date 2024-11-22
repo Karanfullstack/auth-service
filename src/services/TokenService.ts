@@ -1,28 +1,26 @@
-import { JwtPayload } from 'jsonwebtoken';
-import jwt from 'jsonwebtoken';
-import { Config } from '../config';
-import { readFileSync } from 'fs';
 import createHttpError from 'http-errors';
-import path from 'path';
 import { inject, injectable } from 'inversify';
-import { User } from '../entity/User';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Repository } from 'typeorm';
+import { Config } from '../config';
 import { MS_IN_2DAYS, MS_IN_YEAR, TYPES } from '../constants';
 import { RefreshToken } from '../entity/RefreshToken';
-import { Repository } from 'typeorm';
+import { User } from '../entity/User';
 
 @injectable()
 class TokenService {
-    private privateKey: Buffer;
+    private readonly privateKey: string;
     private refreshTokenSecret = Config.REFRESH_TOKEN_SECRET as string;
 
     constructor(
         @inject(TYPES.RefreshTokenRepository)
         private RefreshTokenRepository: Repository<RefreshToken>,
-    ) {}
+    ) {
+        this.privateKey = Config.PRIVATE_KEY as string;
+    }
 
     generateAccessToken(payload: JwtPayload): string {
         try {
-            this.privateKey = readFileSync(path.join(__dirname, '../../certs/private.pem'));
             const accessToken = jwt.sign(payload, this.privateKey, {
                 algorithm: 'RS256',
                 expiresIn: MS_IN_2DAYS,

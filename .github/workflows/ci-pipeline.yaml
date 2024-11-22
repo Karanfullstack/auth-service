@@ -36,6 +36,7 @@ jobs:
                   ISSUER_TOKEN: ${{ secrets.ISSUER_TOKEN }}
                   JWKS_URI: ${{ secrets.JWKS_URI }}
                   BCRYPT_SALT: ${{ secrets.BCRYPT_SALT }}
+                  PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
 
             - name: Build TypeScript
               run: npm run build

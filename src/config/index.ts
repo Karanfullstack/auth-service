@@ -17,6 +17,7 @@ const {
     ISSUER_TOKEN,
     HOST,
     JWKS_URI,
+    PRIVATE_KEY,
 } = process.env;
 
 export const Config = {
@@ -33,4 +34,5 @@ export const Config = {
     EXPIRES_DATE_TOKEN,
     ISSUER_TOKEN,
     JWKS_URI,
+    PRIVATE_KEY,
 };
