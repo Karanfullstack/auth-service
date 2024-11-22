@@ -49,7 +49,8 @@ class AuthService implements IAuthService {
             relations: { tenant: true },
         });
         if (!data) {
-            throw new Error('error while creating a user');
+            const err = createHttpError(400, 'Error  while creating a new user');
+            throw err;
         }
         return data;
     }
