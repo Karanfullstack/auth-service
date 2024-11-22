@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { Config } from '../config';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import createHttpError from 'http-errors';
 
 @injectable()
