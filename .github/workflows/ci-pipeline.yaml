@@ -10,7 +10,7 @@ on:
 
 jobs:
     build-and-test:
-        name: Build and Test
+        name: build and test
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -48,13 +48,14 @@ jobs:
 
     build-and-push-docker:
         name: Build and Push Docker Image
+        needs: build-and-test
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
-            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-            DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-            IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-            IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
+            IMAGE_NAME: karanfullstack/auth-service-prodcution
+            IMAGE_TAG: build-${{ github.run_number}}
+
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@v3
@@ -66,7 +67,7 @@ jobs:
                   password: ${{ secrets.DOCKER_PASSWORD }}
 
             - name: Build Docker image
-              run: docker build -t ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} -f docker/production/Dockerfile .
+              run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -f docker/production/Dockerfile .
 
             - name: Push Docker image
-              run: docker push ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+              run: docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
