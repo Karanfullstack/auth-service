@@ -72,7 +72,7 @@ describe('POST /auth/register', () => {
             const users = await userRepository.find();
             expect(users[0].password).not.toBe(userData.password);
             expect(users[0].password).toHaveLength(60);
-            expect(users[0].password).toMatch(/^\$2b\$\d+\$/);
+            expect(users[0].password).toMatch(/^\$2a\$\d+\$/);
         });
 
         it('should return 400 status code if the email is already registered', async () => {

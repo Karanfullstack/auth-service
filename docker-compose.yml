@@ -9,6 +9,7 @@ services:
         volumes:
             - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
             - /usr/src/app/node_modules # Exclude node_modules
+
         stdin_open: true # Equivalent to -it
         tty: true # Allocate a pseudo-TTY
         restart: always
