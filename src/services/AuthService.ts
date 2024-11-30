@@ -76,7 +76,7 @@ class AuthService implements IAuthService {
     }
 
     async self(id: number): Promise<User> {
-        const user = await this.authRepository.findByID(id);
+        const user = await this.getUserById(id);
         if (!user) {
             const err = createHttpError(404, 'User not found');
             throw err;
@@ -94,21 +94,22 @@ class AuthService implements IAuthService {
 
     async getAllUsers(query: IUserQuery): Promise<[User[], number]> {
         const queryBuilder = this.authRepository.queryBuilder('user');
-        if (query.q) {
+
+        if (query.q || query.role) {
             const searchTerm = `%${query.q}%`;
-            queryBuilder
-                .where(`CONCAT(user.firstName, ' ', user.lastName) ILike :q`, {
-                    q: searchTerm,
-                })
-                .orWhere('user.email ILike :q', { q: searchTerm });
+            if (query.q) {
+                queryBuilder.where((qb) => {
+                    qb.where(`CONCAT(user.firstName, ' ', user.lastName) ILike :q`, {
+                        q: searchTerm,
+                    });
+                });
+            }
+            if (query.role) {
+                queryBuilder.andWhere(`user.role = :role`, {
+                    role: query.role,
+                });
+            }
         }
-
-        if (query.role) {
-            queryBuilder.andWhere('user.role = :role', {
-                role: query.role,
-            });
-        }
-
         const result = await queryBuilder
             .leftJoinAndSelect('user.tenant', 'tenant')
             .skip((query.currentPage - 1) * query.perPage)
