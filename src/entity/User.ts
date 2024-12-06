@@ -20,7 +20,7 @@ export class User implements UserData {
     @Column()
     lastName: string;
 
-    @Column()
+    @Column({ select: false })
     password: string;
 
     @Column()
