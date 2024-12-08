@@ -69,7 +69,7 @@ describe('POST /auth/register', () => {
         it('should store the hashed password in the database', async () => {
             await request(app).post('/auth/register').send(userData);
             const userRepository = connection.getRepository(User);
-            const users = await userRepository.find();
+            const users = await userRepository.find({ select: ['password'] });
             expect(users[0].password).not.toBe(userData.password);
             expect(users[0].password).toHaveLength(60);
             expect(users[0].password).toMatch(/^\$2a\$\d+\$/);

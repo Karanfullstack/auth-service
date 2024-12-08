@@ -59,6 +59,7 @@ class AuthService implements IAuthService {
         const user = await this.authRepository.findOne({
             where: { email },
             relations: { tenant: true },
+            select: ['id', 'firstName', 'lastName', 'email', 'password', 'role'],
         });
 
         if (!user) {
