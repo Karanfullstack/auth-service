@@ -7,6 +7,7 @@ import tenantRouter from './routes/tenant';
 import userRouter from './routes/user';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { globalErrorHandler } from './middlewares/globalError';
 const app = express();
 app.use(express.static('public'));
 app.use(express.json());
@@ -22,21 +23,22 @@ app.use('/auth', authRouter);
 app.use('/tenants', tenantRouter);
 app.use('/users', userRouter);
 
-app.use((error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
-    logger.error(error.message);
-    const statusCode = error.statusCode || error.status || 500;
+app.use(globalErrorHandler);
+// app.use((error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
+//     logger.error(error.message);
+//     const statusCode = error.statusCode || error.status || 500;
 
-    res.status(statusCode).json({
-        errors: [
-            {
-                type: error.name,
-                msg: error.message,
-                path: '',
-                location: '',
-                details: error.stack,
-            },
-        ],
-    });
-});
+//     res.status(statusCode).json({
+//         errors: [
+//             {
+//                 type: error.name,
+//                 msg: error.message,
+//                 path: '',
+//                 location: '',
+//                 details: error.stack,
+//             },
+//         ],
+//     });
+// });
 
 export default app;
