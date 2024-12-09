@@ -15,8 +15,8 @@ class UserController implements IUserController {
     async create(req: IUserCreateRequest, res: Response, next: NextFunction): Promise<void> {
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({ errors: result.array() });
-            return;
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
         }
 
         const { firstName, lastName, email, password, tenantID, role } = req.body;
@@ -55,15 +55,13 @@ class UserController implements IUserController {
         const id = Number(req.params.id);
         if (isNaN(Number(id))) {
             const err = createHttpError(400, 'Inalid Params');
-            next(err);
-            return;
+            return next(err);
         }
         try {
             const user = await this.authService.getUserById(id);
             if (!user) {
                 const err = createHttpError('404', 'User not found');
-                next(err);
-                return;
+                return next(err);
             }
             res.json({ ...user, password: undefined });
         } catch (error) {
@@ -87,13 +85,12 @@ class UserController implements IUserController {
 
         if (isNaN(Number(id))) {
             const err = createHttpError(400, 'Param id is not valid');
-            next(err);
-            return;
+            return next(err);
         }
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({ errors: result.array() });
-            return;
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
         }
 
         const { firstName, lastName, role, tenantID } = req.body;

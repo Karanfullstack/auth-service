@@ -26,8 +26,8 @@ class AuthController implements IAuthController {
         // @VALIDATE REQUEST
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({ errors: result.array() });
-            return;
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
         }
 
         // @BODY
@@ -85,8 +85,8 @@ class AuthController implements IAuthController {
     async login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({ errors: result.array() });
-            return;
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
         }
         const { email, password } = req.body;
         try {

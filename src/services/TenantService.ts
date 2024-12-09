@@ -23,6 +23,7 @@ class TenantService implements ITenantService {
                 q: searchTerm,
             });
         }
+        // query.currentPage = Number(query.currentPage) || 1;
         const [finalResult, count] = await queryBuilder
             .skip((query.currentPage - 1) * query.perPage)
             .take(query.perPage)
@@ -41,14 +42,14 @@ class TenantService implements ITenantService {
     }
 
     async updateOne(id: number, data: ITenant): Promise<Tenant> {
-        const findTeant = await this.tenantRepo.findOne({ where: { id: id } });
-        if (!findTeant) {
+        const findTenant = await this.tenantRepo.findOne({ where: { id } });
+        if (!findTenant) {
             const error = createHttpError(404, 'Tenant not found to be updated');
             throw error;
         }
 
         await this.tenantRepo.updateOne(id, data);
-        return findTeant;
+        return findTenant;
     }
     async getOne(id: number): Promise<Tenant> {
         const tenant = await this.tenantRepo.findOne({ where: { id: id } });

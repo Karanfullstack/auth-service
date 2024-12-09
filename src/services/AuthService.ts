@@ -32,6 +32,10 @@ class AuthService implements IAuthService {
             const err = createHttpError(400, 'User already exists');
             throw err;
         }
+        if (tenantID) {
+            const findTenant = await this.authRepository.findByID(tenantID);
+            if (!findTenant) throw new Error('Tenant ID not found to be deleted');
+        }
 
         const hashed = await this.credentialService.generateHash(password);
 
