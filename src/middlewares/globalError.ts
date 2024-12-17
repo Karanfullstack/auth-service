@@ -12,7 +12,7 @@ export const globalErrorHandler = (
 ) => {
     const errorId = uuidv4();
     const statusCode = error.status || 500;
-    const isProduction = process.env.NODE_ENV === 'dev';
+    const isProduction = process.env.NODE_ENV === 'prod';
     let message = isProduction ? 'Internal server error' : error.message;
 
     if (statusCode < 500) {

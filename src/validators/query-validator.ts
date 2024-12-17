@@ -10,22 +10,29 @@ export default checkSchema(
                 },
             },
         },
-
-        currentPage: {
+        role: {
             trim: true,
             customSanitizer: {
-                options: (currentPage) => {
-                    const parsedValue = Number(currentPage);
-                    return isNaN(Number(currentPage)) ? 1 : parsedValue;
+                options: (value: string) => {
+                    return value ? value : '';
+                },
+            },
+        },
+        currentPage: {
+            customSanitizer: {
+                options: (value) => {
+                    // 2, '2', undefined, 'sdlkfkjds' -> NaN
+                    const parsedValue = Number(value);
+                    return Number.isNaN(parsedValue) ? 1 : parsedValue;
                 },
             },
         },
         perPage: {
-            trim: true,
             customSanitizer: {
-                options: (perPage) => {
-                    const parsedValue = Number(perPage);
-                    return isNaN(Number(perPage)) ? 6 : parsedValue;
+                options: (value) => {
+                    // 2, '2', undefined, 'sdlkfkjds' -> NaN
+                    const parsedValue = Number(value);
+                    return Number.isNaN(parsedValue) ? 6 : parsedValue;
                 },
             },
         },
