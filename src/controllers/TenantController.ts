@@ -16,8 +16,8 @@ class TenantController implements ITenantController {
         const { name, address } = req.body;
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({ errors: result.array() });
-            return;
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
         }
         logger.debug('Request for creating tenant', { name, address });
         try {
@@ -69,6 +69,16 @@ class TenantController implements ITenantController {
 
     async updateOne(req: CreateTenantRequest, res: Response, next: NextFunction): Promise<void> {
         const id = req.params.id;
+        if (isNaN(Number(id))) {
+            const err = createHttpError(400, 'Invalid request id must be an integer');
+            return next(err);
+        }
+
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            const err = createHttpError(400, result.array()[0].msg as string);
+            return next(err);
+        }
         const { name, address } = req.body;
         logger.debug('Request for updating tenant', { id, name, address });
         try {
@@ -85,8 +95,7 @@ class TenantController implements ITenantController {
 
         if (isNaN(Number(id))) {
             const err = createHttpError(400, 'Invalid request id');
-            next(err);
-            return;
+            return next(err);
         }
         logger.debug('Request for getting a single tenant', { id });
         try {
